@@ -1,12 +1,28 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
+
+import data_handler
 
 app = Flask(__name__)
 
-
 @app.route("/")
-def hello():
-    return "Hello World!"
+def route_home():
+    return render_template('home.html')
+
+@app.route("/list")
+def route_list():
+    questions = data_handler.get_all_data_from_questions()
+    return render_template('list.html', questions=questions)
+
+
+@app.route("/question/<question_id>")
+def route_question(question_id):
+    question_data = data_handler.get_question_answers(question_id)
+    title = data_handler.get_question_data(question_id, 'title')
+    return render_template('question.html', question=question_id, question_data=question_data, title=title)
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(
+        port=5000,
+        debug=True
+    )

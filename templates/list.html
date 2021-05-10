@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="EN">
+    <head>
+        <meta charset="UTF-8">
+        <title>List Questions</title>
+    </head>
+    <body>
+        <h1>List Questions</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Submission Time</th>
+                    <th>View Number</th>
+                    <th>Vote Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in questions %}
+                    <td>{{ line.id }}</td>
+                    <td>{{ line.submission_time }}</td>
+                    <td>{{ line.view_number }}</td>
+                    <td>{{ line.vote_number }}</td>
+                    <td><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('route_home') }}">Back to home</a>
+    </body>
+</html>
