@@ -2,5 +2,17 @@
 {% block title %}Add User Question{% endblock %}
 {% block header %}Add User Question{% endblock %}
 {% block route %}{{ url_for('add_new_question') }}{% endblock %}
+{% block title_value %}
+    <label>Question:<br>
+        <textarea rows="4" cols="50" required name="title"></textarea>
+    </label>
+    <br><br>
+{% endblock %}
+{% block question_message_value %}
+    <label>Question Message:<br>
+        <textarea rows="5" cols="60" required name="message"></textarea>
+    </label>
+    <br><br>
+{% endblock %}
 {% block button_value %}value="Ask a question"{% endblock %}
 

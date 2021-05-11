@@ -12,6 +12,11 @@
                 <li>{{ answer }}</li>
             {% endfor %}
         </ul>
+        <ul>
+            {% for answer in answers_data %}
+                <li>{{ answer }}</li>
+            {% endfor %}
+        </ul>
         <a href="{{ url_for('route_list') }}">Back to question list</a>
     </body>
 </html>
