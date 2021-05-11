@@ -1,7 +1,7 @@
 {% extends "common_template.html" %}
 {% block title %}Post An Answer{% endblock %}
 {% block header %}Post An Answer{% endblock %}
-{% block route %}{{ url_for('add_new_question') }}{% endblock %}
+{% block route %}{{ url_for('add_new_answer', question_id=question_id) }}{% endblock %}
 {% block answer_message_value %}
     <label>Answer:<br>
         <textarea rows="4" cols="50" required name="message"></textarea>

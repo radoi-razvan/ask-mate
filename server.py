@@ -20,7 +20,7 @@ def route_question(question_id):
     question_data = data_handler.get_question_content(question_id)
     title = data_handler.get_question_data(question_id, 'title')
     answers_data = data_handler.get_answers(question_id)
-    return render_template('question.html', question=question_id, question_data=question_data, title=title, answers_data=answers_data )
+    return render_template('question.html', question_id=question_id, question_data=question_data, title=title, answers_data=answers_data)
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
@@ -42,14 +42,9 @@ def add_new_answer(question_id):
         form_dict = request.form
         for value in form_dict.values():
             answer_list.append(value)
-        new_answer_id = data_handler.write_answer(question_id, answer_list)
-        # post answer form html
+        data_handler.write_answer(question_id, answer_list)
         return redirect(url_for('route_question', question_id=question_id))
-    
-    return render_template('route_question')
-
-
-
+    return render_template('post_answer.html', question_id=question_id)
 
 
 if __name__ == "__main__":

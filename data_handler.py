@@ -35,7 +35,7 @@ def get_question_content(question_id):
     with open(FILE_QUESTIONS, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
         for line in reader:
-            if line['id'] == question_id:
+            if int(line['id']) == int(question_id):
                 answers_list = line['message'].split(';')
     return answers_list
 
@@ -92,10 +92,9 @@ def write_answer(question_id, answer):
     answer_data.append(max + 1)
     answer_data.append(round(time.time()))
     answer_data.append(0)
-    answer_data.append(0)
     answer_data.append(question_id)
-    answer_data.append(answer)
-    with open(FILE_ANSWERS, 'a', newline = '') as csv_file:
+    answer_data.append(answer[0])
+    with open(FILE_ANSWERS, 'a', newline='') as csv_file:
         fieldnames = DATA_HEADER_ANSWERS
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         data_dict = dict(zip(DATA_HEADER_ANSWERS, answer_data))

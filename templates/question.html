@@ -17,6 +17,7 @@
                 <li>{{ answer }}</li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('route_list') }}">Back to question list</a>
+        <a href="{{ url_for('add_new_answer', question_id=question_id) }}">Add new answer</a><br>
+        <a href="{{ url_for('route_list') }}">Back to question list</a><br>
     </body>
 </html>
