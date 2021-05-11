@@ -8,6 +8,18 @@ app = Flask(__name__)
 def route_home():
     return render_template('home.html')
 
+
+@app.route('/add-question', methods=['GET', 'POST'])
+def add_new_question():
+    question = ''
+    if request.method == 'POST':
+        form_dict = request.form
+        for value in form_dict.values():
+            question = value
+        data_handler.write_user_story(question)
+        return redirect(url_for('route_list'))
+
+
 @app.route("/list")
 def route_list():
     questions = data_handler.get_all_data_from_questions()

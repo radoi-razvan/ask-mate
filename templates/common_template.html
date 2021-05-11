@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% block head %}
+        <meta charset="UTF-8">
+        <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+    <body>
+        <h1>{% block header %}{% endblock %}</h1>
+        <form action="{% block route %}{% endblock %}" method="post">
+            <label>Question:<br>
+                <input type="text" minlength="5" required name="title" {% block title_value %}{% endblock %}>
+            </label>
+            <br><br>
+            {% block status_value %}{% endblock %}
+            <input type="submit" {% block button_value %}{% endblock %}>
+        </form>
+    </body>
+</html>
