@@ -18,10 +18,15 @@ def get_all_data_from_questions():
 
 
 def get_question_data(question_id, options):
-    question_id = int(question_id) - 1
     questions_data_list = get_all_data_from_questions()
-    result_list = questions_data_list[question_id][options]
+    index = 0
+    for element in questions_data_list:
+        if question_id in element.values():
+            result_list = questions_data_list[index][options]
+        else:
+            index += 1
     return result_list
+
 
 
 def get_question_answers(question_id):

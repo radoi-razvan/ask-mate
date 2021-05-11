@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>Question</title>
 </head>
-<body>
-    <h1>Display Question</h1>
-    <h2>{{ title }}</h2>
-    {% for line in questions %}
-
-    {% endfor %}
-</body>
+    <body>
+        <h1>Display Question</h1>
+        <h3>{{ title }}</h3>
+        <ul>
+            {% for answer in question_data %}
+                <li>{{ answer }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('route_list') }}">Back to question list</a>
+    </body>
 </html>
