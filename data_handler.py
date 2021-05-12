@@ -75,6 +75,7 @@ def get_answers(question_id):
             result_dict = {}
             result_dict['id'] = element['id']
             result_dict['message'] = element['message']
+            result_dict['vote_number'] = element['vote_number']
             result_list.append(result_dict)
     return result_list
 
@@ -204,3 +205,64 @@ def write_data(result_list, final_list):
         for data in final_list:
             data_dict = dict(zip(DATA_HEADER_ANSWERS, data))
             writer.writerow(data_dict)
+
+
+def vote_up_question(question_id, vote_type):
+    result_list = []
+    final_list = [DATA_HEADER]
+    questions_list = []
+    with open(FILE_QUESTIONS, 'r') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            questions_list.append(row)
+    for dictionary in questions_list:
+        if dictionary['id'] == question_id:
+            if vote_type == 'up':
+                dictionary['vote_number'] = int(dictionary['vote_number']) + 1
+            else:
+                dictionary['vote_number'] = int(dictionary['vote_number']) - 1
+        result_list.append(dictionary)
+    for element in result_list:
+        final_list.append(list(element.values()))
+    with open(FILE_QUESTIONS, 'w', newline='') as csv_file:
+        fieldnames = DATA_HEADER
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        for data in final_list:
+            data_dict = dict(zip(DATA_HEADER, data))
+            writer.writerow(data_dict)
+
+
+def vote_up_answer(question_id, vote_type):
+    result_list = []
+    final_list = [DATA_HEADER_ANSWERS]
+    questions_list = []
+    with open(FILE_ANSWERS, 'r') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            questions_list.append(row)
+    for dictionary in questions_list:
+        if dictionary['id'] == question_id:
+            if vote_type == 'up':
+                dictionary['vote_number'] = int(dictionary['vote_number']) + 1
+            else:
+                dictionary['vote_number'] = int(dictionary['vote_number']) - 1
+        result_list.append(dictionary)
+    for element in result_list:
+        final_list.append(list(element.values()))
+    with open(FILE_ANSWERS, 'w', newline='') as csv_file:
+        fieldnames = DATA_HEADER_ANSWERS
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        for data in final_list:
+            data_dict = dict(zip(DATA_HEADER_ANSWERS, data))
+            writer.writerow(data_dict)
+
+
+def get_question_by_answer_id(answer_id):
+    questions_list = []
+    with open(FILE_ANSWERS, 'r') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            questions_list.append(row)
+    for dictionary in questions_list:
+        if dictionary['id'] == answer_id:
+            return dictionary['question_id']

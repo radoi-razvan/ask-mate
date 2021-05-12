@@ -8,6 +8,7 @@ app = Flask(__name__)
 def route_home():
     return render_template('home.html')
 
+
 @app.route("/list")
 def route_list():
     if 'order_by' and 'order_direction' in request.args:
@@ -77,6 +78,37 @@ def edit_question_route(question_id):
 def delete_answer_route(answer_id):
     question_id = data_handler.delete_answer(None, answer_id)
     return redirect(url_for('route_question', question_id=question_id))
+
+
+@app.route('/question/<question_id>/vote_up')
+def vote_up_question_route(question_id):
+    vote_type = 'up'
+    data_handler.vote_up_question(question_id, vote_type)
+    return redirect(url_for('route_list'))
+
+
+@app.route('/question/<question_id>/vote_down')
+def vote_down_question_route(question_id):
+    vote_type = 'down'
+    data_handler.vote_up_question(question_id, vote_type)
+    return redirect(url_for('route_list'))
+
+
+@app.route('/answer/<answer_id>/vote_up')
+def vote_up_answer_route(answer_id):
+    vote_type = 'up'
+    data_handler.vote_up_answer(answer_id, vote_type)
+    question_id = data_handler.get_question_by_answer_id(answer_id)
+    return redirect(url_for('route_question', question_id=question_id))
+
+
+@app.route('/answer/<answer_id>/vote_down')
+def vote_down_answer_route(answer_id):
+    vote_type = 'down'
+    data_handler.vote_up_answer(answer_id, vote_type)
+    question_id = data_handler.get_question_by_answer_id(answer_id)
+    return redirect(url_for('route_question', question_id=question_id))
+
 
 
 if __name__ == "__main__":

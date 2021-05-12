@@ -14,6 +14,8 @@
                     <th>View Number</th>
                     <th>Vote Number</th>
                     <th>Title</th>
+                    <th>Vote Up</th>
+                    <th>Vote Down</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,6 +25,8 @@
                     <td>{{ line.view_number }}</td>
                     <td>{{ line.vote_number }}</td>
                     <td><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a></td>
+                    <td><a href="{{ url_for('vote_up_question_route',question_id=line.id) }}">Like</a></td>
+                    <td><a href="{{ url_for('vote_down_question_route',question_id=line.id) }}">Dislike</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

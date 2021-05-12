@@ -15,7 +15,10 @@
         <ul>
             {% for answer in answers_data %}
                 <li>{{ answer['message'] }}</li>
-                <a href="{{ url_for('delete_answer_route', answer_id=answer['id']) }}">Delete answer</a><br>
+                <p>{{ answer['vote_number'] }}</p><br>
+                <a href="{{ url_for('vote_up_answer_route', answer_id=answer['id']) }}">Like</a>
+                <a href="{{ url_for('vote_down_answer_route', answer_id=answer['id']) }}">Dislike</a>
+                <a href="{{ url_for('delete_answer_route',  answer_id=answer['id']) }}">Delete answer</a><br>
             {% endfor %}
         </ul>
         <a href="{{ url_for('add_new_answer', question_id=question_id) }}">Add new answer</a><br>
