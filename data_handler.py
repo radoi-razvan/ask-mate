@@ -142,3 +142,27 @@ def delete_question(question_id):
         for data in final_list:
             data_dict = dict(zip(DATA_HEADER, data))
             writer.writerow(data_dict)
+
+
+def edit_question(question_id, question_data):
+    result_list = []
+    final_list = [DATA_HEADER]
+    questions_list = []
+    with open(FILE_QUESTIONS, 'r') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            questions_list.append(row)
+    for dictionary in questions_list:
+        if dictionary['id'] == question_id:
+            dictionary['submission_time'] = round(time.time())
+            dictionary['title'] = question_data[0]
+            dictionary['message'] = question_data[1]
+        result_list.append(dictionary)
+    for element in result_list:
+        final_list.append(list(element.values()))
+    with open(FILE_QUESTIONS, 'w', newline='') as csv_file:
+        fieldnames = DATA_HEADER
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        for data in final_list:
+            data_dict = dict(zip(DATA_HEADER, data))
+            writer.writerow(data_dict)
