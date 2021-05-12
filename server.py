@@ -73,6 +73,12 @@ def edit_question_route(question_id):
     return render_template('edit_question.html', question_id=question_id, title=title, message=message)
 
 
+@app.route('/answer/<answer_id>/delete')
+def delete_answer_route(answer_id):
+    question_id = data_handler.delete_answer(None, answer_id)
+    return redirect(url_for('route_question', question_id=question_id))
+
+
 if __name__ == "__main__":
     app.run(
         port=5000,
