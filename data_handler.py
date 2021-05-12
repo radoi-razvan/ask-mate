@@ -8,7 +8,7 @@ DATA_HEADER = ['id', 'submission_time', 'view_number', 'vote_number', 'title' , 
 DATA_HEADER_ANSWERS = ['id', 'submission_time', 'vote_number', 'question_id', 'message', 'image']
 
 
-def get_all_data_from_questions():
+def get_data_questions_unsorted():
     questions_list = []
     with open(FILE_QUESTIONS, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
@@ -17,6 +17,12 @@ def get_all_data_from_questions():
             date_time = datetime.fromtimestamp(timestamp)
             row['submission_time'] = date_time
             questions_list.append(row)
+    return questions_list
+
+
+def get_all_data_from_questions():
+    questions_list = get_data_questions_unsorted()
+    questions_list = sorted(questions_list, key=lambda current_dict: current_dict['submission_time'], reverse=True)
     return questions_list
 
 
@@ -102,3 +108,37 @@ def write_answer(question_id, answer):
     return answer_data[0]
 
 
+def sort_questions(order_by, order_direction):
+    current_questions_list = get_all_data_from_questions()
+    if order_direction == 'desc':
+        direction = True
+    elif order_direction == 'asc':
+        direction = False
+    if order_by == 'view_number' or order_by == 'vote_number':
+        sorted_questions_list = sorted(current_questions_list, key=lambda current_dict: int(current_dict[order_by]),
+                                           reverse=direction)
+    else:
+        sorted_questions_list = sorted(current_questions_list, key=lambda current_dict: current_dict[order_by],
+                                       reverse=direction)
+    return sorted_questions_list
+
+
+def delete_question(question_id):
+    result_list = []
+    final_list = [DATA_HEADER]
+    questions_list = []
+    with open(FILE_QUESTIONS, 'r') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            questions_list.append(row)
+    for dictionary in questions_list:
+        if dictionary['id'] != question_id:
+            result_list.append(dictionary)
+    for element in result_list:
+        final_list.append(list(element.values()))
+    with open(FILE_QUESTIONS, 'w', newline='') as csv_file:
+        fieldnames = DATA_HEADER
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        for data in final_list:
+            data_dict = dict(zip(DATA_HEADER, data))
+            writer.writerow(data_dict)
