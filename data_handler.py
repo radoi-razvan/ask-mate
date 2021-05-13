@@ -30,7 +30,7 @@ def get_question_data(question_id, options):
     questions_data_list = get_all_data_from_questions()
     index = 0
     for element in questions_data_list:
-        if question_id in element.values():
+        if question_id == element['id']:
             result_list = questions_data_list[index][options]
         else:
             index += 1
