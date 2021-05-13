@@ -3,7 +3,7 @@ import platform
 
 from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
-from helpers import Constants as ct
+from helpers import constants as ct
 import data_handler
 
 
@@ -24,19 +24,19 @@ def route_list():
             order_by, order_direction = request.args["order_by"], request.args["order_direction"]
             questions = data_handler.sort_questions(order_by, order_direction)
         else:
-            questions = data_handler.get_all_data_from_questions()
+            questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS)
     else:
-        questions = data_handler.get_all_data_from_questions()
+        questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS)
     return render_template('list.html', questions=questions)
 
 
 @app.route("/question/<question_id>")
 def route_question(question_id):
     data_handler.increment_view_number(question_id)
-    question_message_content = data_handler.get_question_content(question_id)
-    question_title = data_handler.get_question_data(question_id, 'title')
-    question_image_path = data_handler.get_question_data(question_id, 'image')
-    answers_data = data_handler.get_answers_data(question_id)
+    question_message_content = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'message').split(';')
+    question_title = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'title')
+    question_image_path = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'image')
+    answers_data = data_handler.get_answers(question_id)
     print('answer data', answers_data)
     return render_template('question.html', question_id=question_id, question_data=question_message_content, title=question_title, answers_data=answers_data, question_image_path=question_image_path)
 
@@ -57,7 +57,7 @@ def add_new_question():
         else:
 
             question_list.append('')
-        question_id = data_handler.write_user_question(question_list)
+        question_id = data_handler.post_question(question_list)
         return redirect(url_for('route_question', question_id=question_id))
     return render_template('add_question.html')
 
@@ -82,7 +82,7 @@ def add_new_answer(question_id):
             answer_list.append(file_path)
         else:
             answer_list.append('')
-        data_handler.write_answer(question_id, answer_list)
+        data_handler.post_answer(question_id, answer_list)
         return redirect(url_for('route_question', question_id=question_id))
     return render_template('post_answer.html', question_id=question_id)
 
@@ -102,8 +102,8 @@ def edit_question_route(question_id):
             question_data.append(value)
         data_handler.edit_question(question_id, question_data)
         return redirect(url_for('route_question', question_id=question_id))
-    title = data_handler.get_question_data(question_id, 'title')
-    message = data_handler.get_question_data(question_id, 'message')
+    title = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'title')
+    message = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'message')
     return render_template('edit_question.html', question_id=question_id, title=title, message=message)
 
 
