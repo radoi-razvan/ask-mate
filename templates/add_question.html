@@ -2,6 +2,7 @@
 {% block title %}Add User Question{% endblock %}
 {% block header %}Add User Question{% endblock %}
 {% block route %}{{ url_for('add_new_question') }}{% endblock %}
+{% block enctype %}{{ "multipart/form-data" }}{% endblock %}
 {% block title_value %}
     <label>Question:<br>
         <textarea rows="4" cols="50" required name="title"></textarea>
@@ -14,5 +15,18 @@
     </label>
     <br><br>
 {% endblock %}
+{%  block add_image %}
+    <label>Upload Image:<br>
+         <input type = "file" name = "file" />
+         {# <input type = "submit"/> #}
+    </label>
+    <br><br>
+{%  endblock %}
 {% block button_value %}value="Ask a question"{% endblock %}
 
+{#
+<form action = "http://localhost:5000/uploader" method = "POST"
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file" />
+         <input type = "submit"/>
+</form>#}

@@ -1,8 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for
+import os
+import platform
 
+from flask import Flask, render_template, request, redirect, url_for, flash
+from werkzeug.utils import secure_filename
+from helpers import Constants as ct
 import data_handler
 
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = ct.UPLOAD_FOLDER
+app.config['MAX_CONTENT_PATH'] = ct.MAX_PHOTO_SIZE
+
 
 @app.route("/")
 def route_home():
@@ -24,6 +32,7 @@ def route_list():
 
 @app.route("/question/<question_id>")
 def route_question(question_id):
+    data_handler.increment_view_number(question_id)
     question_data = data_handler.get_question_content(question_id)
     title = data_handler.get_question_data(question_id, 'title')
     answers_data = data_handler.get_answers(question_id)
@@ -34,12 +43,33 @@ def route_question(question_id):
 def add_new_question():
     question_list = []
     if request.method == 'POST':
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        if file in request.files:
+            if platform.system().lower() == 'windows':
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/'))
+            else:
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         form_dict = request.form
         for value in form_dict.values():
             question_list.append(value)
         question_id = data_handler.write_user_question(question_list)
         return redirect(url_for('route_question', question_id=question_id))
     return render_template('add_question.html')
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ct.ALLOWED_EXTENSIONS
+
+
+#@app.route('/uploader', methods=['GET', 'POST'])
+#def upload_file():
+#    if request.method == 'POST':
+#        file = request.files['file']
+#        filename = secure_filename(file.filename)
+#        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/'))
+#        return 'file uploaded successfully'
 
 
 @app.route('/question/<question_id>/new-answer', methods=['GET', 'POST'])

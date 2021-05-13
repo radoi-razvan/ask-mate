@@ -266,3 +266,26 @@ def get_question_by_answer_id(answer_id):
     for dictionary in questions_list:
         if dictionary['id'] == answer_id:
             return dictionary['question_id']
+
+
+def increment_view_number(question_id):
+    result_list = []
+    final_list = [DATA_HEADER]
+    questions_list = []
+    with open(FILE_QUESTIONS, 'r') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            questions_list.append(row)
+    for dictionary in questions_list:
+        if dictionary['id'] == question_id:
+            dictionary['view_number'] = int(dictionary['view_number']) + 1
+        result_list.append(dictionary)
+    for element in result_list:
+        final_list.append(list(element.values()))
+    with open(FILE_QUESTIONS, 'w', newline='') as csv_file:
+        fieldnames = DATA_HEADER
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        for data in final_list:
+            data_dict = dict(zip(DATA_HEADER, data))
+            writer.writerow(data_dict)
+
