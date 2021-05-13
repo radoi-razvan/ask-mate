@@ -59,6 +59,8 @@ def write_user_question(question_list):
     question_data.append(0)
     question_data.append(question_list[0])
     question_data.append(question_list[1])
+    if question_list[2] != '':
+        question_data.append(question_list[2])
     with open(FILE_QUESTIONS, 'a', newline = '') as csv_file:
         fieldnames = DATA_HEADER
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -104,6 +106,8 @@ def write_answer(question_id, answer):
     answer_data.append(0)
     answer_data.append(question_id)
     answer_data.append(answer[0])
+    if answer[1] != '':
+        answer_data.append(answer[1])
     with open(FILE_ANSWERS, 'a', newline='') as csv_file:
         fieldnames = DATA_HEADER_ANSWERS
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)

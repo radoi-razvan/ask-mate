@@ -6,12 +6,12 @@
     {% endblock %}
     <body>
         <h1>{% block header %}{% endblock %}</h1>
-        <form action="{% block route %}{% endblock %}" method="post" enctype ="{% block enctype %}{% endblock %}">
+        <form action="{% block route %}{% endblock %}" method="post">
          {% block title_value %}{% endblock %}
          {% block question_message_value %}{% endblock %}
          {% block answer_message_value %}{% endblock %}
-         {% block add_image %}{% endblock %}
             <input type="submit" {% block button_value %}{% endblock %}>
         </form>
     </body>
 </html>
+

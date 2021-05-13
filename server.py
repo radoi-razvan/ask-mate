@@ -1,7 +1,7 @@
 import os
 import platform
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from helpers import Constants as ct
 import data_handler
@@ -43,16 +43,18 @@ def route_question(question_id):
 def add_new_question():
     question_list = []
     if request.method == 'POST':
-        file = request.files['file']
-        filename = secure_filename(file.filename)
-        if file in request.files:
-            if platform.system().lower() == 'windows':
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/'))
-            else:
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         form_dict = request.form
         for value in form_dict.values():
             question_list.append(value)
+        file = request.files['file']
+        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
+            file.save(file_path)
+            question_list.append(file_path)
+        else:
+
+            question_list.append('')
         question_id = data_handler.write_user_question(question_list)
         return redirect(url_for('route_question', question_id=question_id))
     return render_template('add_question.html')
@@ -63,15 +65,6 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ct.ALLOWED_EXTENSIONS
 
 
-#@app.route('/uploader', methods=['GET', 'POST'])
-#def upload_file():
-#    if request.method == 'POST':
-#        file = request.files['file']
-#        filename = secure_filename(file.filename)
-#        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/'))
-#        return 'file uploaded successfully'
-
-
 @app.route('/question/<question_id>/new-answer', methods=['GET', 'POST'])
 def add_new_answer(question_id):
     answer_list = []
@@ -79,6 +72,14 @@ def add_new_answer(question_id):
         form_dict = request.form
         for value in form_dict.values():
             answer_list.append(value)
+        file = request.files['file']
+        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
+            file.save(file_path)
+            answer_list.append(file_path)
+        else:
+            answer_list.append('')
         data_handler.write_answer(question_id, answer_list)
         return redirect(url_for('route_question', question_id=question_id))
     return render_template('post_answer.html', question_id=question_id)

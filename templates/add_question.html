@@ -1,32 +1,42 @@
-{% extends "common_template.html" %}
-{% block title %}Add User Question{% endblock %}
-{% block header %}Add User Question{% endblock %}
-{% block route %}{{ url_for('add_new_question') }}{% endblock %}
-{% block enctype %}{{ "multipart/form-data" }}{% endblock %}
-{% block title_value %}
-    <label>Question:<br>
-        <textarea rows="4" cols="50" required name="title"></textarea>
-    </label>
-    <br><br>
-{% endblock %}
-{% block question_message_value %}
-    <label>Question Message:<br>
-        <textarea rows="5" cols="60" required name="message"></textarea>
-    </label>
-    <br><br>
-{% endblock %}
-{%  block add_image %}
-    <label>Upload Image:<br>
-         <input type = "file" name = "file" />
-         {# <input type = "submit"/> #}
-    </label>
-    <br><br>
-{%  endblock %}
-{% block button_value %}value="Ask a question"{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add User Question</title>
+</head>
+<body>
+    <h1>Add User Question</h1>
+    <form enctype="multipart/form-data" action="{{ url_for('add_new_question') }}" method="post" >
+        <ul>
+            <li>
+                <label for="title">Question</label>
+                <br>
+                <textarea rows="4" cols="50" name="title" required="required"></textarea>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <label for="message">Question message</label>
+                <br>
+                <textarea rows="5" cols="60" name="message" required="required"></textarea>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <label for="picture">Add Photo (only .jpg and .png extensions)</label>
+                <br>
+                <input type="file" name="file"/>
+                <br>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <input type="submit" value="Post question"/>
+            </li>
+        </ul>
+    </form>
 
-{#
-<form action = "http://localhost:5000/uploader" method = "POST"
-         enctype = "multipart/form-data">
-         <input type = "file" name = "file" />
-         <input type = "submit"/>
-</form>#}
+</body>
+</html>
+
+
