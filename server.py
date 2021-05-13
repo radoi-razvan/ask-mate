@@ -33,10 +33,12 @@ def route_list():
 @app.route("/question/<question_id>")
 def route_question(question_id):
     data_handler.increment_view_number(question_id)
-    question_data = data_handler.get_question_content(question_id)
-    title = data_handler.get_question_data(question_id, 'title')
-    answers_data = data_handler.get_answers(question_id)
-    return render_template('question.html', question_id=question_id, question_data=question_data, title=title, answers_data=answers_data)
+    question_message_content = data_handler.get_question_content(question_id)
+    question_title = data_handler.get_question_data(question_id, 'title')
+    question_image_path = data_handler.get_question_data(question_id, 'image')
+    answers_data = data_handler.get_answers_data(question_id)
+    print('answer data', answers_data)
+    return render_template('question.html', question_id=question_id, question_data=question_message_content, title=question_title, answers_data=answers_data, question_image_path=question_image_path)
 
 
 @app.route('/add-question', methods=['GET', 'POST'])

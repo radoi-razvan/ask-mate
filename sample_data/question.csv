@@ -1,6 +1,6 @@
 id,submission_time,view_number,vote_number,title,message,image
-1,1493368154,29,7,How to make lists in Python?,"I am totally new to this, any hints?",
-2,1493068124,15,9,Wordpress loading multiple jQuery Versions,"I developed a plugin that uses the jquery booklet plugin (http://builtbywill.com/booklet/#/) this plugin binds a function to $ so I cann call $('.myBook').booklet();
+1,1493368154,30,7,How to make lists in Python?,"I am totally new to this, any hints?",
+2,1493068124,16,9,Wordpress loading multiple jQuery Versions,"I developed a plugin that uses the jquery booklet plugin (http://builtbywill.com/booklet/#/) this plugin binds a function to $ so I cann call $('.myBook').booklet();
 
 I could easy managing the loading order with wp_enqueue_script so first I load jquery then I load booklet so everything is fine.
 
@@ -9,7 +9,7 @@ BUT in my theme i also using jquery via webpack so the loading order is now foll
 jquery
 booklet
 app.js (bundled file with webpack, including jquery)",images/image1.png
-3,1493015432,1365,57,Drawing canvas with an image picked with Cordova Camera Plugin,"I'm getting an image from device and drawing a canvas with filters using Pixi JS. It works all well using computer to get an image. But when I'm on IOS, it throws errors such as cross origin issue, or that I'm trying to use an unknown format.
+3,1493015432,1366,57,Drawing canvas with an image picked with Cordova Camera Plugin,"I'm getting an image from device and drawing a canvas with filters using Pixi JS. It works all well using computer to get an image. But when I'm on IOS, it throws errors such as cross origin issue, or that I'm trying to use an unknown format.
 
 This is the code I'm using to draw the image (that works on web/desktop but not cordova built ios app)",
 4,1493015435,5,0,Some question?,,
@@ -18,18 +18,19 @@ This is the code I'm using to draw the image (that works on web/desktop but not 
 7,1620731573,1,0,Some question 4?,Some answer 4,
 8,1620731839,4,0,What time is it?,Some time,
 9,1620896587,1,0,buna ce mai faci,mesaj 123456,
-10,1620896614,2,0,buna ce mai faci,mesaj 123456,
+10,1620896614,3,0,buna ce mai faci,mesaj 123456,
 11,1620896648,1,0,intrebare 000,raspiuns 000,
 12,1620902287,1,0,buna 111,ce faci 111,
 13,1620902382,1,0,intreabre 2222,continut 2222,
-14,1620902517,1,0,question333,content 333,
-15,1620902641,1,0,questsio444,content444,
+14,1620902517,2,0,question333,content 333,
+15,1620902641,2,0,questsio444,content444,
 16,1620902711,1,0,question555,content555,
 17,1620902757,1,0,question555,content555,
 18,1620903349,1,0,quesiton678,conetn789,
-19,1620903391,1,0,intreabre 9999999999,content 189999,
+19,1620903391,1,1,intreabre 9999999999,content 189999,
 20,1620903416,1,0,intreabre 99999999909,content 18999909,
 21,1620904290,1,0,buna fwfs,lfznsfwr,
-22,1620904380,1,0,buna fwfs,lfznsfwr,
-23,1620904912,1,0,buna 123456789,content 123456789,
-24,1620905169,8,0,question`00000,conentent 12641934,
+22,1620904380,2,0,buna fwfs,lfznsfwr,
+23,1620904912,3,0,buna 123456789,content 123456789,
+24,1620905169,40,0,question`00000,conentent 12641934,
+25,1620908279,21,0,buna ce mai zici,mesajul este...,static/uploads/apuseni-1.jpg

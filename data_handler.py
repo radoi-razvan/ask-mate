@@ -37,6 +37,20 @@ def get_question_data(question_id, options):
     return result_list
 
 
+def get_answers_data(question_id):
+    answers_list = get_all_data_from_answers()
+    result_list = []
+    for element in answers_list:
+        if question_id == element['question_id']:
+            result_dict = {}
+            result_dict['id'] = element['id']
+            result_dict['message'] = element['message']
+            result_dict['vote_number'] = element['vote_number']
+            result_dict['image'] = element['image']
+            result_list.append(result_dict)
+    return result_list
+
+
 def get_question_content(question_id):
     with open(FILE_QUESTIONS, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
@@ -67,19 +81,6 @@ def write_user_question(question_list):
         data_dict = dict(zip(DATA_HEADER, question_data))
         writer.writerow(data_dict)
     return question_data[0]
-
-
-def get_answers(question_id):
-    answers_list = get_all_data_from_answers()
-    result_list = []
-    for element in answers_list:
-        if question_id == element['question_id']:
-            result_dict = {}
-            result_dict['id'] = element['id']
-            result_dict['message'] = element['message']
-            result_dict['vote_number'] = element['vote_number']
-            result_list.append(result_dict)
-    return result_list
 
 
 def get_all_data_from_answers():

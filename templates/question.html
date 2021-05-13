@@ -5,17 +5,26 @@
     <title>Question</title>
 </head>
     <body>
-        <h1>Display Question</h1>
+        <h1>Question</h1>
         <h3>{{ title }}</h3>
+        {% if question_image_path != '' %}
+                <img src= "{{ "/" + question_image_path }}" width="200" height="200">
+                {% endif %}
         <ul>
-            {% for answer in question_data %}
-                <li>{{ answer }}</li>
+
+            {% for content in question_data %}
+                <strong><li>{{ content }}</li></strong>
             {% endfor %}
+        <p>Answers:</p>
         </ul>
         <ul>
             {% for answer in answers_data %}
                 <li>{{ answer['message'] }}</li>
-                <p>{{ answer['vote_number'] }}</p><br>
+                {% if answer['image'] != '' %}
+                <img src= "{{ "/" + answer['image'] }}" width="200" height="200">
+                {% endif %}
+                <li>{{ answer['vote_number'] }}</li>
+                <br>
                 <a href="{{ url_for('vote_up_answer_route', answer_id=answer['id']) }}">Like</a>
                 <a href="{{ url_for('vote_down_answer_route', answer_id=answer['id']) }}">Dislike</a>
                 <a href="{{ url_for('delete_answer_route',  answer_id=answer['id']) }}">Delete answer</a><br>
