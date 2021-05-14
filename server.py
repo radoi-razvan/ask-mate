@@ -1,9 +1,8 @@
 import os
-import platform
-
 from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 from helpers import constants as ct
+from helpers import utils
 import data_handler
 
 
@@ -49,7 +48,7 @@ def add_new_question():
         for value in form_dict.values():
             question_list.append(value)
         file = request.files['file']
-        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and allowed_file(file.filename):
+        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
             file.save(file_path)
@@ -62,11 +61,6 @@ def add_new_question():
     return render_template('add_question.html')
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ct.ALLOWED_EXTENSIONS
-
-
 @app.route('/question/<question_id>/new-answer', methods=['GET', 'POST'])
 def add_new_answer(question_id):
     answer_list = []
@@ -75,7 +69,7 @@ def add_new_answer(question_id):
         for value in form_dict.values():
             answer_list.append(value)
         file = request.files['file']
-        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and allowed_file(file.filename):
+        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
             file.save(file_path)
