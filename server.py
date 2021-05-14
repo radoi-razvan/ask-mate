@@ -110,14 +110,14 @@ def delete_answer_route(answer_id):
 @app.route('/question/<question_id>/vote_up')
 def vote_up_question_route(question_id):
     vote_type = 'up'
-    data_handler.vote_up_question(question_id, vote_type)
+    data_handler.count_vote(ct.FILE_QUESTIONS, ct.QUESTION_HEADER, question_id, vote_type)
     return redirect(url_for('route_list'))
 
 
 @app.route('/question/<question_id>/vote_down')
 def vote_down_question_route(question_id):
     vote_type = 'down'
-    data_handler.vote_up_question(question_id, vote_type)
+    data_handler.count_vote(question_id, vote_type)
     return redirect(url_for('route_list'))
 
 
@@ -126,6 +126,7 @@ def vote_up_answer_route(answer_id):
     vote_type = 'up'
     data_handler.vote_up_answer(answer_id, vote_type)
     question_id = data_handler.get_question_by_answer_id(answer_id)
+    print('question_id is ', question_id)
     return redirect(url_for('route_question', question_id=question_id))
 
 

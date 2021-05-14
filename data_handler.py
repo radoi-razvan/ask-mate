@@ -80,11 +80,13 @@ def get_answers(question_id):
 def post_answer(question_id, answer):
     print('posting answer')
     answer_data = []
+    all_answers_list = get_data_unsorted(ct.FILE_ANSWERS)
     data_list = get_answers(question_id)
     max_id = 0
-    for element in data_list:
+    for element in all_answers_list:
         if int(element['id']) > max_id:
             max_id = int(element['id'])
+    print('max id is ', max_id)
     answer_data.append(max_id + 1)
     answer_data.append(round(time.time()))
     answer_data.append(0)
@@ -184,30 +186,25 @@ def write_data(FILE_PATH, HEADER, result_list, final_list):
             data_dict = dict(zip(HEADER, data))
             writer.writerow(data_dict)
 
+
 # to do
-def vote_up_question(question_id, vote_type):
+def count_vote(FILE_PATH, HEADER, element_id, vote_type):
     result_list = []
-    final_list = [ct.QUESTION_HEADER]
-    questions_list = []
-    with open(ct.FILE_QUESTIONS, 'r') as csv_file:
+    final_list = [HEADER]
+    data_list = []
+    with open(FILE_PATH, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
         for row in reader:
-            questions_list.append(row)
-    for dictionary in questions_list:
-        if dictionary['id'] == question_id:
+            data_list.append(row)
+    for dictionary in data_list:
+        if dictionary['id'] == element_id:
             if vote_type == 'up':
                 dictionary['vote_number'] = int(dictionary['vote_number']) + 1
             else:
                 dictionary['vote_number'] = int(dictionary['vote_number']) - 1
         result_list.append(dictionary)
-    for element in result_list:
-        final_list.append(list(element.values()))
-    with open(ct.FILE_QUESTIONS, 'w', newline='') as csv_file:
-        fieldnames = ct.QUESTION_HEADER
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        for data in final_list:
-            data_dict = dict(zip(ct.QUESTION_HEADER, data))
-            writer.writerow(data_dict)
+    write_data(FILE_PATH, HEADER, result_list, final_list)
+
 
 # to do
 def vote_up_answer(question_id, vote_type):
