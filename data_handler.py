@@ -187,7 +187,6 @@ def write_data(FILE_PATH, HEADER, result_list, final_list):
             writer.writerow(data_dict)
 
 
-# to do
 def count_vote(FILE_PATH, HEADER, element_id, vote_type):
     result_list = []
     final_list = [HEADER]
@@ -206,33 +205,7 @@ def count_vote(FILE_PATH, HEADER, element_id, vote_type):
     write_data(FILE_PATH, HEADER, result_list, final_list)
 
 
-# to do
-def vote_up_answer(question_id, vote_type):
-    result_list = []
-    final_list = [ct.ANSWER_HEADER]
-    questions_list = []
-    with open(ct.FILE_ANSWERS, 'r') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            questions_list.append(row)
-    for dictionary in questions_list:
-        if dictionary['id'] == question_id:
-            if vote_type == 'up':
-                dictionary['vote_number'] = int(dictionary['vote_number']) + 1
-            else:
-                dictionary['vote_number'] = int(dictionary['vote_number']) - 1
-        result_list.append(dictionary)
-    for element in result_list:
-        final_list.append(list(element.values()))
-    with open(ct.FILE_ANSWERS, 'w', newline='') as csv_file:
-        fieldnames = ct.ANSWER_HEADER
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        for data in final_list:
-            data_dict = dict(zip(ct.ANSWER_HEADER, data))
-            writer.writerow(data_dict)
-
-
-def get_question_by_answer_id(answer_id):
+def get_question_id_with_answer_id(answer_id):
     questions_list = []
     with open(ct.FILE_ANSWERS, 'r') as csv_file:
         reader = csv.DictReader(csv_file)
