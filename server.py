@@ -23,10 +23,8 @@ def route_list():
             order_by, order_direction = request.args["order_by"], request.args["order_direction"]
             questions = data_handler.sort_questions(order_by, order_direction)
         else:
-            # questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS)
             questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
     else:
-        # questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS, 'formatted-time')
         questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
     return render_template('list.html', questions=questions)
 
@@ -34,9 +32,6 @@ def route_list():
 @app.route("/question/<question_id>")
 def route_question(question_id):
     data_handler.increment_view_number(question_id)
-    # question_message_content = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'message').split(';')
-    # question_title = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'title')
-    # question_image_path = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'image')
     question_message_content = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'message').split(';')
     question_title = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'title')
     question_image_path = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'image')
@@ -99,47 +94,45 @@ def edit_question_route(question_id):
             question_data.append(value)
         data_handler.edit_question(question_id, question_data)
         return redirect(url_for('route_question', question_id=question_id))
-    title = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'title')
-    message = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'message')
+    title = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'title')
+    message = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'message')
     return render_template('edit_question.html', question_id=question_id, title=title, message=message)
 
 
 @app.route('/answer/<answer_id>/delete')
 def delete_answer_route(answer_id):
-    question_id = data_handler.delete_answer(None, answer_id)
+    question_id = data_handler.delete_answer(answer_id)
     return redirect(url_for('route_question', question_id=question_id))
 
 
 @app.route('/question/<question_id>/vote_up')
 def vote_up_question_route(question_id):
-    vote_type = 'up'
-    data_handler.count_vote(ct.FILE_QUESTIONS, ct.QUESTION_HEADER, question_id, vote_type)
+    vote_type = 1
+    data_handler.count_vote(ct.TABLE_QUESTION, question_id, vote_type)
     return redirect(url_for('route_list'))
 
 
 @app.route('/question/<question_id>/vote_down')
 def vote_down_question_route(question_id):
-    vote_type = 'down'
-    data_handler.count_vote(ct.FILE_QUESTIONS, ct.QUESTION_HEADER, question_id, vote_type)
+    vote_type = -1
+    data_handler.count_vote(ct.TABLE_QUESTION, question_id, vote_type)
     return redirect(url_for('route_list'))
 
 
 @app.route('/answer/<answer_id>/vote_up')
 def vote_up_answer_route(answer_id):
-    vote_type = 'up'
-    data_handler.count_vote(ct.FILE_ANSWERS, ct.ANSWER_HEADER, answer_id, vote_type)
+    vote_type = 1
+    data_handler.count_vote(ct.TABLE_ANSWER, answer_id, vote_type)
     question_id = data_handler.get_question_id_with_answer_id(answer_id)
-    print('question_id is ', question_id)
     return redirect(url_for('route_question', question_id=question_id))
 
 
 @app.route('/answer/<answer_id>/vote_down')
 def vote_down_answer_route(answer_id):
-    vote_type = 'down'
-    data_handler.count_vote(ct.FILE_ANSWERS, ct.ANSWER_HEADER, answer_id, vote_type)
+    vote_type = -1
+    data_handler.count_vote(ct.TABLE_ANSWER, answer_id, vote_type)
     question_id = data_handler.get_question_id_with_answer_id(answer_id)
     return redirect(url_for('route_question', question_id=question_id))
-
 
 
 if __name__ == "__main__":

@@ -15,33 +15,13 @@ def get_data_unsorted(cursor, table):
     query = sql.SQL("""
         SELECT *
         FROM {table_name}
+        ORDER BY {submission_time_col}
+        DESC
             """).format(
-            table_name=sql.Identifier(table))
+            table_name=sql.Identifier(table),
+            submission_time_col=sql.Identifier('submission_time'))
     cursor.execute(query)
     return cursor.fetchall()
-
-
-# def get_data_unsorted(FILE_PATH, options = 'timestamp'):
-#     data_list = []
-#     with open(FILE_PATH, 'r') as csv_file:
-#         reader = csv.DictReader(csv_file)
-#         for row in reader:
-#             if options != 'timestamp':
-#                 date_time = int((row['submission_time']))
-#                 row['submission_time'] = ut.get_formatted_time(date_time)
-#             data_list.append(row)
-#     return data_list
-
-
-# def get_data_for_id(FILE_PATH, id, options):
-#     data_list = get_data_unsorted(FILE_PATH)
-#     index = 0
-#     for element in data_list:
-#         if id == element['id']:
-#             result_list = data_list[index][options]
-#         else:
-#             index += 1
-#     return result_list
 
 
 @database_common.connection_handler
@@ -62,36 +42,44 @@ def get_data_for_id(cursor, table, question_id, options):
     return result_list
 
 
-def post_question(question_list):
-    question_data = []
-    # questions_data_list = get_data_unsorted(ct.FILE_QUESTIONS)
-    questions_data_list = get_data_unsorted(ct.TABLE_QUESTION)
-    max = 0
-    for element in questions_data_list:
-        if int(element['id']) > max:
-            max = int(element['id'])
-    question_data.append(max + 1)
-    # question_data.append(round(time.time()))
-    # post_time = ut.get_formatted_time(round(time.time()))
-    # question_data.append(post_time)
-
-    question_data.append(0)
-    question_data.append(0)
-    question_data.append(question_list[0])
-    question_data.append(question_list[1])
-    print(question_data)
-    # if question_list[2] != '':
-    #     question_data.append(question_list[2])
-    # with open(ct.FILE_QUESTIONS, 'a', newline = '') as csv_file:
-    #     fieldnames = ct.QUESTION_HEADER
-    #     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-    #     data_dict = dict(zip(ct.QUESTION_HEADER, question_data))
-    #     writer.writerow(data_dict)
-    # return question_data[0]
+@database_common.connection_handler
+def post_question(cursor, question_list):
+    if question_list[2] == '':
+        question_list[2] = None
+    post_time = ut.get_formatted_time(round(time.time()))
+    query = sql.SQL("""
+        INSERT INTO {table_name} ({submission_time_col},{view_number_col},
+        {vote_number_col},{title_col},{message_col},{image_col})
+        VALUES(%(s_m)s, %(vote_n)s, %(view_n)s, %(t)s, %(m)s, %(i)s)
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        submission_time_col=sql.Identifier('submission_time'),
+        vote_number_col=sql.Identifier('vote_number'),
+        view_number_col=sql.Identifier('view_number'),
+        title_col=sql.Identifier('title'),
+        message_col=sql.Identifier('message'),
+        image_col=sql.Identifier('image'))
+    cursor.execute(query, {'s_m': post_time,
+                           'vote_n': 0,
+                           'view_n': 0,
+                           't': question_list[0],
+                           'm': question_list[1],
+                           'i': question_list[2]
+                           })
+    query = sql.SQL("""
+            SELECT MAX({id_col})
+            FROM {table_name}
+                """).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query)
+    data_dict = cursor.fetchall()
+    for dictionary in data_dict:
+        result_list = dictionary['max']
+    return result_list
 
 
 def get_answers(question_id):
-    # answers_list = get_data_unsorted(ct.FILE_ANSWERS, 'formatted_date')
     answers_list = get_data_unsorted(ct.TABLE_ANSWER)
     result_list = []
     for element in answers_list:
@@ -114,34 +102,44 @@ def get_answers(question_id):
     return result_list
 
 
-def post_answer(question_id, answer):
-    print('posting answer')
-    answer_data = []
-    all_answers_list = get_data_unsorted(ct.FILE_ANSWERS)
-    data_list = get_answers(question_id)
-    max_id = 0
-    for element in all_answers_list:
-        if int(element['id']) > max_id:
-            max_id = int(element['id'])
-    print('max id is ', max_id)
-    answer_data.append(max_id + 1)
-    answer_data.append(round(time.time()))
-    answer_data.append(0)
-    answer_data.append(question_id)
-    answer_data.append(answer[0])
-    if answer[1] != '':
-        answer_data.append(answer[1])
-    with open(ct.FILE_ANSWERS, 'a', newline='') as csv_file:
-        fieldnames = ct.ANSWER_HEADER
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        data_dict = dict(zip(ct.ANSWER_HEADER, answer_data))
-        writer.writerow(data_dict)
-    return answer_data[0]
+@database_common.connection_handler
+def post_answer(cursor, question_id, answer):
+    if answer[1] == '':
+        answer[1] = None
+    post_time = ut.get_formatted_time(round(time.time()))
+    query = sql.SQL("""
+        INSERT INTO {table_name} ({submission_time_col},{vote_number_col},
+        {question_id_col},{message_col},{image_col})
+        VALUES(%(s_m)s, %(vote_n)s, %(q_i)s, %(m)s, %(i)s)
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        submission_time_col=sql.Identifier('submission_time'),
+        vote_number_col=sql.Identifier('vote_number'),
+        view_number_col=sql.Identifier('view_number'),
+        question_id_col=sql.Identifier('question_id'),
+        message_col=sql.Identifier('message'),
+        image_col=sql.Identifier('image'))
+    cursor.execute(query, {'s_m': post_time,
+                           'vote_n': 0,
+                           'q_i': question_id,
+                           'm': answer[0],
+                           'i': answer[1]
+                           })
+    query = sql.SQL("""
+            SELECT MAX({id_col})
+            FROM {table_name}
+                """).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query)
+    data_dict = cursor.fetchall()
+    for dictionary in data_dict:
+        result_list = dictionary['max']
+    return result_list
 
 
 def sort_questions(order_by, order_direction):
     current_questions_list = get_data_unsorted(ct.TABLE_QUESTION)
-    # current_questions_list = get_data_unsorted(ct.FILE_QUESTIONS)
     if order_direction == 'desc':
         direction = True
     elif order_direction == 'asc':
@@ -154,126 +152,84 @@ def sort_questions(order_by, order_direction):
                                        reverse=direction)
     return sorted_questions_list
 
-# to do
-# def delete_from_database() for questions or answers
+
+@database_common.connection_handler
+def edit_question(cursor, question_id, question_data):
+    query = sql.SQL("""
+        UPDATE {table_name} 
+        SET {title_col} = %(t)s,{message_col} = %(m)s
+        WHERE {id_col} = %(i)s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        id_col=sql.Identifier('id'),
+        title_col=sql.Identifier('title'),
+        message_col=sql.Identifier('message'))
+    cursor.execute(query, {'t': question_data[0],
+                           'm': question_data[1],
+                           'i': question_id
+                           })
 
 
-# to do
-def edit_question(question_id, question_data):
-    result_list = []
-    final_list = [ct.QUESTION_HEADER]
-    questions_list = []
-    with open(ct.FILE_QUESTIONS, 'r') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            questions_list.append(row)
-    for dictionary in questions_list:
-        if dictionary['id'] == question_id:
-            dictionary['submission_time'] = round(time.time())
-            dictionary['title'] = question_data[0]
-            dictionary['message'] = question_data[1]
-        result_list.append(dictionary)
-    for element in result_list:
-        final_list.append(list(element.values()))
-    print('final list is ', final_list)
-    with open(ct.FILE_QUESTIONS, 'w', newline='') as csv_file:
-        fieldnames = ct.QUESTION_HEADER
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        for data in final_list:
-            data_dict = dict(zip(ct.QUESTION_HEADER, data))
-            writer.writerow(data_dict)
+@database_common.connection_handler
+def delete_answer(cursor, answer_id):
+    question_id = get_question_id_with_answer_id(answer_id)
+    query = sql.SQL("""
+        DELETE FROM {table_name}
+        WHERE {id_col} = %s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query, (answer_id,))
+    return question_id
 
 
-# to do
-def delete_answer(question_id = None, answer_id = None):
-    result_list = []
-    final_list = [ct.ANSWER_HEADER]
-    answers_list = get_data_unsorted(ct.FILE_ANSWERS)
-    if answer_id is None:
-        for dictionary in answers_list:
-            if dictionary['question_id'] != question_id:
-                result_list.append(dictionary)
-        write_data(ct.FILE_ANSWERS, ct.ANSWER_HEADER, result_list, final_list)
-    else:
-        for dictionary in answers_list:
-            if dictionary['id'] == answer_id:
-                question_id = dictionary['question_id']
-            else:
-                result_list.append(dictionary)
-        write_data(ct.FILE_ANSWERS, ct.ANSWER_HEADER, result_list, final_list)
-        return question_id
+@database_common.connection_handler
+def delete_question(cursor, question_id):
+    query = sql.SQL("""
+        DELETE FROM {table_name}
+        WHERE {id_col} = %s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query, (question_id,))
+    query = sql.SQL("""
+        DELETE FROM {table_name}
+        WHERE {question_id_col} = %s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        question_id_col=sql.Identifier('question_id'))
+    cursor.execute(query, (question_id,))
 
 
-def delete_question(question_id):
-    result_list = []
-    final_list = [ct.QUESTION_HEADER]
-    questions_list = get_data_unsorted(ct.FILE_QUESTIONS)
-    for element in questions_list:
-        if element['id'] != question_id:
-            result_list.append(element)
-    write_data(ct.FILE_QUESTIONS, ct.QUESTION_HEADER, result_list, final_list)
+@database_common.connection_handler
+def count_vote(cursor, table, element_id, vote):
+    query = sql.SQL("""
+        UPDATE {table_name}
+        SET {vote_number_col} = {vote_number_col} + %s
+        WHERE {id_col} = %s
+            """).format(
+        table_name=sql.Identifier(table),
+        vote_number_col=sql.Identifier('vote_number'),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query, (vote,element_id,))
 
 
-def write_data(FILE_PATH, HEADER, result_list, final_list):
-    for element in result_list:
-        final_list.append(list(element.values()))
-    with open(FILE_PATH, 'w', newline='') as csv_file:
-        fieldnames = HEADER
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        for data in final_list:
-            data_dict = dict(zip(HEADER, data))
-            writer.writerow(data_dict)
+@database_common.connection_handler
+def get_question_id_with_answer_id(cursor, answer_id):
+    query = sql.SQL("""
+                SELECT {question_id_col}
+                FROM {table_name}
+                WHERE {id_col} = %s
+                    """).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        id_col=sql.Identifier('id'),
+        question_id_col=sql.Identifier('question_id'))
+    cursor.execute(query, (answer_id,))
+    data_dict = cursor.fetchall()
+    for dictionary in data_dict:
+        question_id = dictionary['question_id']
+    return question_id
 
-
-def count_vote(FILE_PATH, HEADER, element_id, vote_type):
-    result_list = []
-    final_list = [HEADER]
-    data_list = []
-    with open(FILE_PATH, 'r') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            data_list.append(row)
-    for dictionary in data_list:
-        if dictionary['id'] == element_id:
-            if vote_type == 'up':
-                dictionary['vote_number'] = int(dictionary['vote_number']) + 1
-            else:
-                dictionary['vote_number'] = int(dictionary['vote_number']) - 1
-        result_list.append(dictionary)
-    write_data(FILE_PATH, HEADER, result_list, final_list)
-
-
-def get_question_id_with_answer_id(answer_id):
-    questions_list = []
-    with open(ct.FILE_ANSWERS, 'r') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            questions_list.append(row)
-    for dictionary in questions_list:
-        if dictionary['id'] == answer_id:
-            return dictionary['question_id']
-
-
-# def increment_view_number(question_id):
-#     result_list = []
-#     final_list = [ct.QUESTION_HEADER]
-#     questions_list = []
-#     with open(ct.FILE_QUESTIONS, 'r') as csv_file:
-#         reader = csv.DictReader(csv_file)
-#         for row in reader:
-#             questions_list.append(row)
-#     for dictionary in questions_list:
-#         if dictionary['id'] == question_id:
-#             dictionary['view_number'] = int(dictionary['view_number']) + 1
-#         result_list.append(dictionary)
-#     for element in result_list:
-#         final_list.append(list(element.values()))
-#     with open(ct.FILE_QUESTIONS, 'w', newline='') as csv_file:
-#         fieldnames = ct.QUESTION_HEADER
-#         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-#         for data in final_list:
-#             data_dict = dict(zip(ct.QUESTION_HEADER, data))
-#             writer.writerow(data_dict)
 
 @database_common.connection_handler
 def increment_view_number(cursor, question_id):
