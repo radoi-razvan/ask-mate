@@ -1,63 +1,101 @@
 import csv
 from datetime import datetime
 from helpers import constants as ct
-from helpers import  utils as ut
+from helpers import utils as ut
 import time
 
-
-def get_data_unsorted(FILE_PATH, options = 'timestamp'):
-    data_list = []
-    with open(FILE_PATH, 'r') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            if options != 'timestamp':
-                date_time = int((row['submission_time']))
-                row['submission_time'] = ut.get_formatted_time(date_time)
-            data_list.append(row)
-    return data_list
+from typing import List, Dict
+from psycopg2 import sql
+from psycopg2.extras import RealDictCursor
+import database_common
 
 
-def get_data_for_id(FILE_PATH, id, options):
-    data_list = get_data_unsorted(FILE_PATH)
-    index = 0
-    for element in data_list:
-        if id == element['id']:
-            result_list = data_list[index][options]
-        else:
-            index += 1
+@database_common.connection_handler
+def get_data_unsorted(cursor, table):
+    query = sql.SQL("""
+        SELECT *
+        FROM {table_name}
+            """).format(
+            table_name=sql.Identifier(table))
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+# def get_data_unsorted(FILE_PATH, options = 'timestamp'):
+#     data_list = []
+#     with open(FILE_PATH, 'r') as csv_file:
+#         reader = csv.DictReader(csv_file)
+#         for row in reader:
+#             if options != 'timestamp':
+#                 date_time = int((row['submission_time']))
+#                 row['submission_time'] = ut.get_formatted_time(date_time)
+#             data_list.append(row)
+#     return data_list
+
+
+# def get_data_for_id(FILE_PATH, id, options):
+#     data_list = get_data_unsorted(FILE_PATH)
+#     index = 0
+#     for element in data_list:
+#         if id == element['id']:
+#             result_list = data_list[index][options]
+#         else:
+#             index += 1
+#     return result_list
+
+
+@database_common.connection_handler
+def get_data_for_id(cursor, table, question_id, options):
+    result_list = []
+    query = sql.SQL("""
+        SELECT {options_col}
+        FROM {table_name}
+        WHERE {id_col} = %s
+            """).format(
+        table_name=sql.Identifier(table),
+        id_col=sql.Identifier('id'),
+        options_col=sql.Identifier(options))
+    cursor.execute(query, (question_id,))
+    data_dict = cursor.fetchall()
+    for dictionary in data_dict:
+        result_list = dictionary[options]
     return result_list
 
 
-# to do
 def post_question(question_list):
     question_data = []
-    questions_data_list = get_data_unsorted(ct.FILE_QUESTIONS)
+    # questions_data_list = get_data_unsorted(ct.FILE_QUESTIONS)
+    questions_data_list = get_data_unsorted(ct.TABLE_QUESTION)
     max = 0
     for element in questions_data_list:
         if int(element['id']) > max:
             max = int(element['id'])
     question_data.append(max + 1)
-    question_data.append(round(time.time()))
+    # question_data.append(round(time.time()))
+    # post_time = ut.get_formatted_time(round(time.time()))
+    # question_data.append(post_time)
+
     question_data.append(0)
     question_data.append(0)
     question_data.append(question_list[0])
     question_data.append(question_list[1])
-    if question_list[2] != '':
-        question_data.append(question_list[2])
-    with open(ct.FILE_QUESTIONS, 'a', newline = '') as csv_file:
-        fieldnames = ct.QUESTION_HEADER
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        data_dict = dict(zip(ct.QUESTION_HEADER, question_data))
-        writer.writerow(data_dict)
-    return question_data[0]
+    print(question_data)
+    # if question_list[2] != '':
+    #     question_data.append(question_list[2])
+    # with open(ct.FILE_QUESTIONS, 'a', newline = '') as csv_file:
+    #     fieldnames = ct.QUESTION_HEADER
+    #     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    #     data_dict = dict(zip(ct.QUESTION_HEADER, question_data))
+    #     writer.writerow(data_dict)
+    # return question_data[0]
 
 
 def get_answers(question_id):
-    answers_list = get_data_unsorted(ct.FILE_ANSWERS, 'formatted_date')
+    # answers_list = get_data_unsorted(ct.FILE_ANSWERS, 'formatted_date')
+    answers_list = get_data_unsorted(ct.TABLE_ANSWER)
     result_list = []
     for element in answers_list:
         if question_id == 'ALL':
-            print('getting all')
             result_dict = {}
             result_dict['id'] = element['id']
             result_dict['submission_time'] = element['submission_time']
@@ -66,8 +104,7 @@ def get_answers(question_id):
             result_dict['message'] = element['message']
             result_dict['image'] = element['image']
             result_list.append(result_dict)
-        elif question_id == element['question_id']:
-                print('getting for question id ', question_id)
+        elif int(question_id) == element['question_id']:
                 result_dict = {}
                 result_dict['id'] = element['id']
                 result_dict['message'] = element['message']
@@ -103,7 +140,8 @@ def post_answer(question_id, answer):
 
 
 def sort_questions(order_by, order_direction):
-    current_questions_list = get_data_unsorted(ct.FILE_QUESTIONS)
+    current_questions_list = get_data_unsorted(ct.TABLE_QUESTION)
+    # current_questions_list = get_data_unsorted(ct.FILE_QUESTIONS)
     if order_direction == 'desc':
         direction = True
     elif order_direction == 'asc':
@@ -216,24 +254,35 @@ def get_question_id_with_answer_id(answer_id):
             return dictionary['question_id']
 
 
-def increment_view_number(question_id):
-    result_list = []
-    final_list = [ct.QUESTION_HEADER]
-    questions_list = []
-    with open(ct.FILE_QUESTIONS, 'r') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            questions_list.append(row)
-    for dictionary in questions_list:
-        if dictionary['id'] == question_id:
-            dictionary['view_number'] = int(dictionary['view_number']) + 1
-        result_list.append(dictionary)
-    for element in result_list:
-        final_list.append(list(element.values()))
-    with open(ct.FILE_QUESTIONS, 'w', newline='') as csv_file:
-        fieldnames = ct.QUESTION_HEADER
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        for data in final_list:
-            data_dict = dict(zip(ct.QUESTION_HEADER, data))
-            writer.writerow(data_dict)
+# def increment_view_number(question_id):
+#     result_list = []
+#     final_list = [ct.QUESTION_HEADER]
+#     questions_list = []
+#     with open(ct.FILE_QUESTIONS, 'r') as csv_file:
+#         reader = csv.DictReader(csv_file)
+#         for row in reader:
+#             questions_list.append(row)
+#     for dictionary in questions_list:
+#         if dictionary['id'] == question_id:
+#             dictionary['view_number'] = int(dictionary['view_number']) + 1
+#         result_list.append(dictionary)
+#     for element in result_list:
+#         final_list.append(list(element.values()))
+#     with open(ct.FILE_QUESTIONS, 'w', newline='') as csv_file:
+#         fieldnames = ct.QUESTION_HEADER
+#         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+#         for data in final_list:
+#             data_dict = dict(zip(ct.QUESTION_HEADER, data))
+#             writer.writerow(data_dict)
 
+@database_common.connection_handler
+def increment_view_number(cursor, question_id):
+    query = sql.SQL("""
+        UPDATE {table_name}
+        SET {view_number_col} = {view_number_col} + 1
+        WHERE {id_col} = %s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        view_number_col=sql.Identifier('view_number'),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query, (question_id,))

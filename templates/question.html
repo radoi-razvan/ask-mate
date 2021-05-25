@@ -7,7 +7,7 @@
     <body>
         <h1>Question</h1>
         <h3>{{ title }}</h3>
-        {% if question_image_path != '' %}
+        {% if question_image_path != None %}
                 <img src= "{{ "/" + question_image_path }}" width="200" height="200">
                 {% endif %}
         <ul>
@@ -20,7 +20,7 @@
         <ul>
             {% for answer in answers_data %}
                 <li>{{ answer['message'] }}</li>
-                {% if answer['image'] != '' %}
+                {% if answer['image'] != None %}
                 <img src= "{{ "/" + answer['image'] }}" width="200" height="200">
                 {% endif %}
                 <li>{{ answer['vote_number'] }}</li>

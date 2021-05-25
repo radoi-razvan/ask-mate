@@ -23,20 +23,24 @@ def route_list():
             order_by, order_direction = request.args["order_by"], request.args["order_direction"]
             questions = data_handler.sort_questions(order_by, order_direction)
         else:
-            questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS)
+            # questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS)
+            questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
     else:
-        questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS, 'formatted-time')
+        # questions = data_handler.get_data_unsorted(ct.FILE_QUESTIONS, 'formatted-time')
+        questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
     return render_template('list.html', questions=questions)
 
 
 @app.route("/question/<question_id>")
 def route_question(question_id):
     data_handler.increment_view_number(question_id)
-    question_message_content = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'message').split(';')
-    question_title = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'title')
-    question_image_path = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'image')
+    # question_message_content = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'message').split(';')
+    # question_title = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'title')
+    # question_image_path = data_handler.get_data_for_id(ct.FILE_QUESTIONS, question_id, 'image')
+    question_message_content = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'message').split(';')
+    question_title = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'title')
+    question_image_path = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'image')
     answers_data = data_handler.get_answers(question_id)
-    print('answer data', answers_data)
     return render_template('question.html', question_id=question_id, question_data=question_message_content, title=question_title, answers_data=answers_data, question_image_path=question_image_path)
 
 
@@ -54,7 +58,6 @@ def add_new_question():
             file.save(file_path)
             question_list.append(file_path)
         else:
-
             question_list.append('')
         question_id = data_handler.post_question(question_list)
         return redirect(url_for('route_question', question_id=question_id))
