@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Question Tag</title>
+</head>
+<body>
+    <h1>Add Question Tag</h1>
+    <form enctype="multipart/form-data" action="{{ url_for('add_question_tag') }}" method="post" >
+        <ul>
+            <li>
+                <label for="message">Tag</label>
+                <br>
+                <textarea rows="4" cols="60" name="message" required="required"></textarea>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <input type="submit" value="Post comment"/>
+            </li>
+        </ul>
+    </form>
+</body>

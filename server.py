@@ -36,7 +36,20 @@ def route_question(question_id):
     question_title = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'title')
     question_image_path = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'image')
     answers_data = data_handler.get_answers(question_id)
-    return render_template('question.html', question_id=question_id, question_data=question_message_content, title=question_title, answers_data=answers_data, question_image_path=question_image_path)
+    question_comments_data = data_handler.get_comments_with_id(question_id, 'question')
+    return render_template('question.html', question_id=question_id, question_data=question_message_content, title=question_title, answers_data=answers_data, question_image_path=question_image_path, comments_data=question_comments_data)
+
+
+# @app.route("/question/<question_id>")
+# def route_question(question_id):
+#     print('question id is ', question_id)
+#     # data_handler.increment_view_number(question_id)
+#     question_message_content = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'message').split(';')
+#     question_title = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'title')
+#     question_image_path = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, 'image')
+#     answers_data = data_handler.get_answers(question_id)
+#
+#     return render_template('question.html', question_id=question_id, question_data=question_message_content, title=question_title, question_image_path=question_image_path, answers_data=answers_data, )
 
 
 @app.route('/add-question', methods=['GET', 'POST'])
@@ -133,6 +146,28 @@ def vote_down_answer_route(answer_id):
     data_handler.count_vote(ct.TABLE_ANSWER, answer_id, vote_type)
     question_id = data_handler.get_question_id_with_answer_id(answer_id)
     return redirect(url_for('route_question', question_id=question_id))
+
+
+@app.route("/question/<question_id>/new-comment",  methods=['GET', 'POST'])
+def add_question_comment(question_id):
+    print('question id is ', question_id)
+    if request.method == 'POST':
+        print('ok123')
+        comment_message = request.form['message']
+        print('comment mess is ', comment_message)
+        data_handler.post_comment(question_id, None, comment_message)
+        return redirect(url_for('route_question', question_id=question_id))
+    return render_template('question_comment.html', question_id=question_id)
+
+
+@app.route("/answer/<answer_id>/new-comment",  methods=['GET', 'POST'])
+def add_answer_comment(answer_id):
+    question_id = data_handler.get_question_id_with_answer_id(answer_id)
+    if request.method == 'POST':
+        comment_message = request.form
+        data_handler.post_comment(None, answer_id, comment_message)
+        return redirect(url_for('route_question', question_id=question_id))
+    return render_template('answer_comment.html', answer_id=answer_id)
 
 
 if __name__ == "__main__":

@@ -242,3 +242,90 @@ def increment_view_number(cursor, question_id):
         view_number_col=sql.Identifier('view_number'),
         id_col=sql.Identifier('id'))
     cursor.execute(query, (question_id,))
+
+
+@database_common.connection_handler
+def get_comments_with_id(cursor, corespondent_id, options):
+    question_id = None
+    answer_id = None
+    if options == 'question':
+        question_id = corespondent_id
+    elif options == 'answer':
+        answer_id = corespondent_id
+    print('question id = ', question_id)
+    print('answer id = ', answer_id)
+    query = sql.SQL("""
+        SELECT * 
+        FROM {table_name} 
+        WHERE {question_id_col} = %(q_id)s AND {answer_id_col} IS NULL OR {question_id_col} IS NULL AND {answer_id_col} = %(a_id)s
+        """).format(
+        table_name=sql.Identifier(ct.TABLE_COMMENT),
+        question_id_col=sql.Identifier('question_id'),
+        answer_id_col=sql.Identifier('answer_id'))
+    cursor.execute(query, {'q_id': question_id,
+                           'a_id': answer_id
+                           })
+    results = []
+    ex = cursor.fetchall()
+    print('ex is ', ex)
+    for dictionary in ex:
+        results.append(dictionary)
+    print('results is ', results)
+    return results
+
+
+@database_common.connection_handler
+def post_comment(cursor, question_id, answer_id , content):
+    print('question id from post_comment is ', question_id)
+    print('answer id from post_comment is ', answer_id)
+    post_time = ut.get_formatted_time(round(time.time()))
+    query = sql.SQL("""
+        INSERT INTO {table_name} ({question_id_col},{answer_id_col},{message_col},{submission_time_col},{edited_count_col})
+        VALUES(%(q_id)s, %(a_id)s, %(message)s, %(submission_time)s, %(edited_count)s)
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_COMMENT),
+        submission_time_col=sql.Identifier('submission_time'),
+        question_id_col=sql.Identifier('question_id'),
+        answer_id_col=sql.Identifier('answer_id'),
+        message_col=sql.Identifier('message'),
+        edited_count_col=sql.Identifier('edited_count'))
+    cursor.execute(query, {'q_id': question_id,
+                           'a_id': answer_id,
+                           'message': content,
+                           'submission_time': post_time,
+                           'edited_count': None
+                           })
+    print('ok')
+
+
+@database_common.connection_handler
+def delete_comment(cursor, comment_id):
+    query = sql.SQL("""
+        DELETE FROM {table_name}
+        WHERE {id_col} = %s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_COMMENT),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query, (comment_id,))
+    query = sql.SQL("""
+        DELETE FROM {table_name}
+        WHERE {question_id_col} = %s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        question_id_col=sql.Identifier('id'))
+    cursor.execute(query, (comment_id,))
+
+
+@database_common.connection_handler
+def edit_comment(cursor, comment_id, content):
+    query = sql.SQL("""
+        UPDATE {table_name} 
+        SET {message_col} = %(m)s
+        WHERE {id_col} = %(i)s
+            """).format(
+        table_name=sql.Identifier(ct.TABLE_COMMENT),
+        id_col=sql.Identifier('id'),
+        message_col=sql.Identifier('message'))
+    cursor.execute(query, {'message': content,
+                           'comment_id': comment_id
+                           })
