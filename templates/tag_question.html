@@ -6,17 +6,35 @@
 </head>
 <body>
     <h1>Add Question Tag</h1>
-    <form enctype="multipart/form-data" action="{{ url_for('add_question_tag') }}" method="post" >
+    <form enctype="multipart/form-data" action="{{ url_for('add_question_tag',tags=tags_list ,question_id=question_id) }}" method="post" >
         <ul>
             <li>
-                <label for="message">Tag</label>
+                <label for="tag"> Select a tag</label>
                 <br>
-                <textarea rows="4" cols="60" name="message" required="required"></textarea>
+                <select name="tag">
+                    {% for tag in tags %}
+                        <option value="{{ tag['name'] }}">#{{ tag['name'] }}</option>
+                    {% endfor %}
+                </select>
             </li>
         </ul>
         <ul>
             <li>
-                <input type="submit" value="Post comment"/>
+                <input type="submit" value="Add tag"/>
+            </li>
+        </ul>
+    </form>
+    <form enctype="multipart/form-data" action="{{ url_for('add_question_tag',tags=tags_list ,question_id=question_id) }}" method="post" >
+        <ul>
+            <li>
+                <label for="tag_name">Create a tag</label>
+                <br>
+                <input name="tag_name" type="text" placeholder="add new tag"/>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <input type="submit" value="Add tag"/>
             </li>
         </ul>
     </form>

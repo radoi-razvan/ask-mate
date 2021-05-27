@@ -1,7 +1,7 @@
 {% extends "common_template.html" %}
 {% block title %}Edit Comment{% endblock %}
 {% block header %}Edit Comment{% endblock %}
-{% block route %}{{ url_for('edit_comments_route', comment_id=comment_id) }}{% endblock %}
+{% block route %}{{ url_for('edit_comment_route', comment_id=comment_id, message=message) }}{% endblock %}
 {% block question_message_value %}
     <label>Message:<br>
         <textarea rows="4" cols="50" required name="message">{{ message }}</textarea>

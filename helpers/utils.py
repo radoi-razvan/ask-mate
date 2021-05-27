@@ -9,5 +9,6 @@ def get_formatted_time(timestamp):
 
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ct.ALLOWED_EXTENSIONS
+    return (
+        "." in filename and filename.rsplit(".", 1)[1].lower() in ct.ALLOWED_EXTENSIONS
+    )

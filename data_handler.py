@@ -12,70 +12,84 @@ import database_common
 
 @database_common.connection_handler
 def get_data_unsorted(cursor, table):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         SELECT *
         FROM {table_name}
         ORDER BY {submission_time_col}
         DESC
-            """).format(
-            table_name=sql.Identifier(table),
-            submission_time_col=sql.Identifier('submission_time'))
+            """
+    ).format(
+        table_name=sql.Identifier(table),
+        submission_time_col=sql.Identifier("submission_time"),
+    )
     cursor.execute(query)
     return cursor.fetchall()
 
 
 @database_common.connection_handler
-def get_data_for_id(cursor, table, question_id, options):
+def get_data_for_id(cursor, table, element_id, options, el_id="id"):
     result_list = []
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         SELECT {options_col}
         FROM {table_name}
         WHERE {id_col} = %s
-            """).format(
+            """
+    ).format(
         table_name=sql.Identifier(table),
-        id_col=sql.Identifier('id'),
-        options_col=sql.Identifier(options))
-    cursor.execute(query, (question_id,))
+        id_col=sql.Identifier(el_id),
+        options_col=sql.Identifier(options),
+    )
+    cursor.execute(query, (element_id,))
     data_dict = cursor.fetchall()
     for dictionary in data_dict:
         result_list = dictionary[options]
+
     return result_list
 
 
 @database_common.connection_handler
 def post_question(cursor, question_list):
-    if question_list[2] == '':
+    if question_list[2] == "":
         question_list[2] = None
     post_time = ut.get_formatted_time(round(time.time()))
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         INSERT INTO {table_name} ({submission_time_col},{view_number_col},
         {vote_number_col},{title_col},{message_col},{image_col})
         VALUES(%(s_m)s, %(vote_n)s, %(view_n)s, %(t)s, %(m)s, %(i)s)
-            """).format(
+            """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_QUESTION),
-        submission_time_col=sql.Identifier('submission_time'),
-        vote_number_col=sql.Identifier('vote_number'),
-        view_number_col=sql.Identifier('view_number'),
-        title_col=sql.Identifier('title'),
-        message_col=sql.Identifier('message'),
-        image_col=sql.Identifier('image'))
-    cursor.execute(query, {'s_m': post_time,
-                           'vote_n': 0,
-                           'view_n': 0,
-                           't': question_list[0],
-                           'm': question_list[1],
-                           'i': question_list[2]
-                           })
-    query = sql.SQL("""
+        submission_time_col=sql.Identifier("submission_time"),
+        vote_number_col=sql.Identifier("vote_number"),
+        view_number_col=sql.Identifier("view_number"),
+        title_col=sql.Identifier("title"),
+        message_col=sql.Identifier("message"),
+        image_col=sql.Identifier("image"),
+    )
+    cursor.execute(
+        query,
+        {
+            "s_m": post_time,
+            "vote_n": 0,
+            "view_n": 0,
+            "t": question_list[0],
+            "m": question_list[1],
+            "i": question_list[2],
+        },
+    )
+    query = sql.SQL(
+        """
             SELECT MAX({id_col})
             FROM {table_name}
-                """).format(
-        table_name=sql.Identifier(ct.TABLE_QUESTION),
-        id_col=sql.Identifier('id'))
+                """
+    ).format(table_name=sql.Identifier(ct.TABLE_QUESTION), id_col=sql.Identifier("id"))
     cursor.execute(query)
     data_dict = cursor.fetchall()
     for dictionary in data_dict:
-        result_list = dictionary['max']
+        result_list = dictionary["max"]
     return result_list
 
 
@@ -83,164 +97,214 @@ def get_answers(question_id):
     answers_list = get_data_unsorted(ct.TABLE_ANSWER)
     result_list = []
     for element in answers_list:
-        if question_id == 'ALL':
+        if question_id == "ALL":
             result_dict = {}
-            result_dict['id'] = element['id']
-            result_dict['submission_time'] = element['submission_time']
-            result_dict['vote_number'] = element['vote_number']
-            result_dict['question_id'] = element['question_id']
-            result_dict['message'] = element['message']
-            result_dict['image'] = element['image']
+            result_dict["id"] = element["id"]
+            result_dict["submission_time"] = element["submission_time"]
+            result_dict["vote_number"] = element["vote_number"]
+            result_dict["question_id"] = element["question_id"]
+            result_dict["message"] = element["message"]
+            result_dict["image"] = element["image"]
             result_list.append(result_dict)
-        elif int(question_id) == element['question_id']:
-                result_dict = {}
-                result_dict['id'] = element['id']
-                result_dict['message'] = element['message']
-                result_dict['vote_number'] = element['vote_number']
-                result_dict['image'] = element['image']
-                result_list.append(result_dict)
+        elif int(question_id) == element["question_id"]:
+            result_dict = {}
+            result_dict["id"] = element["id"]
+            result_dict["message"] = element["message"]
+            result_dict["vote_number"] = element["vote_number"]
+            result_dict["image"] = element["image"]
+            result_list.append(result_dict)
     return result_list
 
 
 @database_common.connection_handler
 def post_answer(cursor, question_id, answer):
-    if answer[1] == '':
+    if answer[1] == "":
         answer[1] = None
     post_time = ut.get_formatted_time(round(time.time()))
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         INSERT INTO {table_name} ({submission_time_col},{vote_number_col},
         {question_id_col},{message_col},{image_col})
         VALUES(%(s_m)s, %(vote_n)s, %(q_i)s, %(m)s, %(i)s)
-            """).format(
+            """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_ANSWER),
-        submission_time_col=sql.Identifier('submission_time'),
-        vote_number_col=sql.Identifier('vote_number'),
-        view_number_col=sql.Identifier('view_number'),
-        question_id_col=sql.Identifier('question_id'),
-        message_col=sql.Identifier('message'),
-        image_col=sql.Identifier('image'))
-    cursor.execute(query, {'s_m': post_time,
-                           'vote_n': 0,
-                           'q_i': question_id,
-                           'm': answer[0],
-                           'i': answer[1]
-                           })
-    query = sql.SQL("""
+        submission_time_col=sql.Identifier("submission_time"),
+        vote_number_col=sql.Identifier("vote_number"),
+        view_number_col=sql.Identifier("view_number"),
+        question_id_col=sql.Identifier("question_id"),
+        message_col=sql.Identifier("message"),
+        image_col=sql.Identifier("image"),
+    )
+    cursor.execute(
+        query,
+        {
+            "s_m": post_time,
+            "vote_n": 0,
+            "q_i": question_id,
+            "m": answer[0],
+            "i": answer[1],
+        },
+    )
+    query = sql.SQL(
+        """
             SELECT MAX({id_col})
             FROM {table_name}
-                """).format(
-        table_name=sql.Identifier(ct.TABLE_ANSWER),
-        id_col=sql.Identifier('id'))
+                """
+    ).format(table_name=sql.Identifier(ct.TABLE_ANSWER), id_col=sql.Identifier("id"))
     cursor.execute(query)
     data_dict = cursor.fetchall()
     for dictionary in data_dict:
-        result_list = dictionary['max']
+        result_list = dictionary["max"]
     return result_list
+
+
+@database_common.connection_handler
+def edit_answer(cursor, answer_id, content):
+    print('content is ', content)
+    query = sql.SQL(
+        """
+        UPDATE {table_name} 
+        SET {message_col} = %(message)s
+        WHERE {id_col} = %(id)s
+            """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        id_col=sql.Identifier("id"),
+        message_col=sql.Identifier("message"),
+    )
+    cursor.execute(query, {"id": answer_id, "message": content})
 
 
 def sort_questions(order_by, order_direction):
     current_questions_list = get_data_unsorted(ct.TABLE_QUESTION)
-    if order_direction == 'desc':
+    if order_direction == "desc":
         direction = True
-    elif order_direction == 'asc':
+    elif order_direction == "asc":
         direction = False
-    if order_by == 'view_number' or order_by == 'vote_number':
-        sorted_questions_list = sorted(current_questions_list, key=lambda current_dict: int(current_dict[order_by]),
-                                           reverse=direction)
+    if order_by == "view_number" or order_by == "vote_number":
+        sorted_questions_list = sorted(
+            current_questions_list,
+            key=lambda current_dict: int(current_dict[order_by]),
+            reverse=direction,
+        )
     else:
-        sorted_questions_list = sorted(current_questions_list, key=lambda current_dict: current_dict[order_by],
-                                       reverse=direction)
+        sorted_questions_list = sorted(
+            current_questions_list,
+            key=lambda current_dict: current_dict[order_by],
+            reverse=direction,
+        )
     return sorted_questions_list
 
 
 @database_common.connection_handler
 def edit_question(cursor, question_id, question_data):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         UPDATE {table_name} 
         SET {title_col} = %(t)s,{message_col} = %(m)s
         WHERE {id_col} = %(i)s
-            """).format(
+            """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_QUESTION),
-        id_col=sql.Identifier('id'),
-        title_col=sql.Identifier('title'),
-        message_col=sql.Identifier('message'))
-    cursor.execute(query, {'t': question_data[0],
-                           'm': question_data[1],
-                           'i': question_id
-                           })
+        id_col=sql.Identifier("id"),
+        title_col=sql.Identifier("title"),
+        message_col=sql.Identifier("message"),
+    )
+    cursor.execute(
+        query, {"t": question_data[0], "m": question_data[1], "i": question_id}
+    )
 
 
 @database_common.connection_handler
 def delete_answer(cursor, answer_id):
     question_id = get_question_id_with_answer_id(answer_id)
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         DELETE FROM {table_name}
         WHERE {id_col} = %s
-            """).format(
-        table_name=sql.Identifier(ct.TABLE_ANSWER),
-        id_col=sql.Identifier('id'))
+            """
+    ).format(table_name=sql.Identifier(ct.TABLE_ANSWER), id_col=sql.Identifier("id"))
     cursor.execute(query, (answer_id,))
     return question_id
 
 
 @database_common.connection_handler
 def delete_question(cursor, question_id):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         DELETE FROM {table_name}
         WHERE {id_col} = %s
-            """).format(
-        table_name=sql.Identifier(ct.TABLE_QUESTION),
-        id_col=sql.Identifier('id'))
+            """
+    ).format(table_name=sql.Identifier(ct.TABLE_QUESTION), id_col=sql.Identifier("id"))
     cursor.execute(query, (question_id,))
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         DELETE FROM {table_name}
         WHERE {question_id_col} = %s
-            """).format(
+            """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_ANSWER),
-        question_id_col=sql.Identifier('question_id'))
+        question_id_col=sql.Identifier("question_id"),
+    )
     cursor.execute(query, (question_id,))
 
 
 @database_common.connection_handler
 def count_vote(cursor, table, element_id, vote):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         UPDATE {table_name}
         SET {vote_number_col} = {vote_number_col} + %s
         WHERE {id_col} = %s
-            """).format(
+            """
+    ).format(
         table_name=sql.Identifier(table),
-        vote_number_col=sql.Identifier('vote_number'),
-        id_col=sql.Identifier('id'))
-    cursor.execute(query, (vote,element_id,))
+        vote_number_col=sql.Identifier("vote_number"),
+        id_col=sql.Identifier("id"),
+    )
+    cursor.execute(
+        query,
+        (
+            vote,
+            element_id,
+        ),
+    )
 
 
 @database_common.connection_handler
 def get_question_id_with_answer_id(cursor, answer_id):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
                 SELECT {question_id_col}
                 FROM {table_name}
                 WHERE {id_col} = %s
-                    """).format(
+                    """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_ANSWER),
-        id_col=sql.Identifier('id'),
-        question_id_col=sql.Identifier('question_id'))
+        id_col=sql.Identifier("id"),
+        question_id_col=sql.Identifier("question_id"),
+    )
     cursor.execute(query, (answer_id,))
     data_dict = cursor.fetchall()
     for dictionary in data_dict:
-        question_id = dictionary['question_id']
+        question_id = dictionary["question_id"]
     return question_id
 
 
 @database_common.connection_handler
 def increment_view_number(cursor, question_id):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         UPDATE {table_name}
         SET {view_number_col} = {view_number_col} + 1
         WHERE {id_col} = %s
-            """).format(
+            """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_QUESTION),
-        view_number_col=sql.Identifier('view_number'),
-        id_col=sql.Identifier('id'))
+        view_number_col=sql.Identifier("view_number"),
+        id_col=sql.Identifier("id"),
+    )
     cursor.execute(query, (question_id,))
 
 
@@ -248,84 +312,176 @@ def increment_view_number(cursor, question_id):
 def get_comments_with_id(cursor, corespondent_id, options):
     question_id = None
     answer_id = None
-    if options == 'question':
+    if options == "question":
         question_id = corespondent_id
-    elif options == 'answer':
+    elif options == "answer":
         answer_id = corespondent_id
-    print('question id = ', question_id)
-    print('answer id = ', answer_id)
-    query = sql.SQL("""
+    print("question id = ", question_id)
+    print("answer id = ", answer_id)
+    query = sql.SQL(
+        """
         SELECT * 
         FROM {table_name} 
         WHERE {question_id_col} = %(q_id)s AND {answer_id_col} IS NULL OR {question_id_col} IS NULL AND {answer_id_col} = %(a_id)s
-        """).format(
+        """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_COMMENT),
-        question_id_col=sql.Identifier('question_id'),
-        answer_id_col=sql.Identifier('answer_id'))
-    cursor.execute(query, {'q_id': question_id,
-                           'a_id': answer_id
-                           })
+        question_id_col=sql.Identifier("question_id"),
+        answer_id_col=sql.Identifier("answer_id"),
+    )
+    cursor.execute(query, {"q_id": question_id, "a_id": answer_id})
     results = []
     ex = cursor.fetchall()
-    print('ex is ', ex)
     for dictionary in ex:
         results.append(dictionary)
-    print('results is ', results)
     return results
 
 
 @database_common.connection_handler
-def post_comment(cursor, question_id, answer_id , content):
-    print('question id from post_comment is ', question_id)
-    print('answer id from post_comment is ', answer_id)
-    post_time = ut.get_formatted_time(round(time.time()))
+def get_option_id_with_comment_id(cursor, comment_id, options):
     query = sql.SQL("""
-        INSERT INTO {table_name} ({question_id_col},{answer_id_col},{message_col},{submission_time_col},{edited_count_col})
-        VALUES(%(q_id)s, %(a_id)s, %(message)s, %(submission_time)s, %(edited_count)s)
-            """).format(
+        SELECT {question_id_col} FROM {table_name}
+        WHERE ({id_col} = %(id)s)
+        """).format(
         table_name=sql.Identifier(ct.TABLE_COMMENT),
-        submission_time_col=sql.Identifier('submission_time'),
-        question_id_col=sql.Identifier('question_id'),
-        answer_id_col=sql.Identifier('answer_id'),
-        message_col=sql.Identifier('message'),
-        edited_count_col=sql.Identifier('edited_count'))
-    cursor.execute(query, {'q_id': question_id,
-                           'a_id': answer_id,
-                           'message': content,
-                           'submission_time': post_time,
-                           'edited_count': None
-                           })
-    print('ok')
+        question_id_col=sql.Identifier(options),
+        id_col=sql.Identifier('id'))
+    cursor.execute(query, {'id': comment_id})
+    data = cursor.fetchall()
+    print(data)
+    return data[0][options]
 
 
 @database_common.connection_handler
-def delete_comment(cursor, comment_id):
-    query = sql.SQL("""
+def get_all_comments(cursor):
+    query = sql.SQL(
+        """
+    SELECT * FROM {table_name}
+        """
+    ).format(table_name=sql.Identifier(ct.TABLE_COMMENT))
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def post_comment(cursor, question_id, answer_id, content):
+    print('content is ', content)
+    post_time = ut.get_formatted_time(round(time.time()))
+    query = """
+        INSERT INTO comment (question_id,answer_id,message,submission_time,edited_count)
+        VALUES (%(q_id)s, %(a_id)s, %(message)s, %(submission_time)s, %(edited_count)s)
+            """
+    cursor.execute(
+        query,
+        {
+            "q_id": question_id,
+            "a_id": answer_id,
+            "message": content,
+            "submission_time": post_time,
+            "edited_count": None,
+        },
+    )
+
+
+@database_common.connection_handler
+def delete_element(cursor, table_name, element_id, options):
+    query = sql.SQL(
+        """
         DELETE FROM {table_name}
         WHERE {id_col} = %s
-            """).format(
-        table_name=sql.Identifier(ct.TABLE_COMMENT),
-        id_col=sql.Identifier('id'))
-    cursor.execute(query, (comment_id,))
-    query = sql.SQL("""
-        DELETE FROM {table_name}
-        WHERE {question_id_col} = %s
-            """).format(
-        table_name=sql.Identifier(ct.TABLE_ANSWER),
-        question_id_col=sql.Identifier('id'))
-    cursor.execute(query, (comment_id,))
+            """
+    ).format(table_name=sql.Identifier(table_name), id_col=sql.Identifier(options))
+    cursor.execute(query, (element_id,))
 
 
 @database_common.connection_handler
 def edit_comment(cursor, comment_id, content):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         UPDATE {table_name} 
-        SET {message_col} = %(m)s
-        WHERE {id_col} = %(i)s
-            """).format(
+        SET {chosen_col} = %(content)s
+        WHERE {id_col} = %(id)s
+            """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_COMMENT),
-        id_col=sql.Identifier('id'),
-        message_col=sql.Identifier('message'))
-    cursor.execute(query, {'message': content,
-                           'comment_id': comment_id
-                           })
+        id_col=sql.Identifier("id"),
+        chosen_col=sql.Identifier("message"),
+    )
+    cursor.execute(query, {"content": content, "id": comment_id})
+
+
+@database_common.connection_handler
+def increment_edited_count(cursor, comment_id):
+    data = get_data_for_id(ct.TABLE_COMMENT, comment_id, "edited_count")
+    print('data is ', data)
+    if data is None:
+        edited_count = 1
+    else:
+        edited_count = data + 1
+    query = sql.SQL(
+        """
+        UPDATE {table_name}
+        SET {chosen_col} = %(edited_count)s
+        WHERE {id_col} = %(id)s
+            """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_COMMENT),
+        id_col=sql.Identifier("id"),
+        chosen_col=sql.Identifier("edited_count"),
+    )
+    cursor.execute(query, {"edited_count": edited_count, "id": comment_id})
+
+
+@database_common.connection_handler
+def get_tags(cursor):
+    query = sql.SQL(
+        """
+    SELECT {tag_name} FROM {table_name}
+        """
+    ).format(table_name=sql.Identifier(ct.TABLE_TAG), tag_name=sql.Identifier("name"))
+    cursor.execute(query)
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def get_tag_id(cursor, tag_name):
+    query = sql.SQL(
+        """
+    SELECT {id_col} FROM {table_name}
+    WHERE {name_col} = %(name)s
+    LIMIT 1
+        """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_TAG),
+        id_col=sql.Identifier("id"),
+        name_col=sql.Identifier("name"),
+    )
+    cursor.execute(query, {"name": tag_name})
+    return cursor.fetchall()
+
+
+@database_common.connection_handler
+def create_tag(cursor, tag_name):
+    query = sql.SQL(
+        """
+        INSERT INTO {table_name} ({name_col})
+        VALUES (%(name)s)
+            """
+    ).format(table_name=sql.Identifier(ct.TABLE_TAG), name_col=sql.Identifier("name"))
+    cursor.execute(query, {"name": tag_name})
+
+
+@database_common.connection_handler
+def add_tag_to_question(cursor, question_id, tag_id):
+    print(f'q_id={question_id} and tag_id={tag_id} ')
+    query = sql.SQL(
+        """
+    INSERT INTO {table_name} ({id_col}, {tag_col})
+    VALUES (%(id_q)s, %(id_tag)s)
+        """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION_TAG),
+        id_col=sql.Identifier("question_id"),
+        tag_col=sql.Identifier("tag_id"),
+    )
+    cursor.execute(query, {"id_q": question_id, "id_tag": tag_id})
