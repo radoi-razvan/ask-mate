@@ -267,10 +267,10 @@ def edit_comment_route(comment_id):
 def add_question_tag(question_id):
     tags_list = data_handler.get_tags()
     if request.method == "POST":
-        if request.form["tag"]:
+        try:
             tag_name = request.form["tag"]
             print('tagssss ', tag_name)
-        else:
+        except:
             tag_name = request.form["tag_name"]
             data_handler.create_tag(tag_name)
 
