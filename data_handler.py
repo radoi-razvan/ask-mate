@@ -24,7 +24,45 @@ def get_data_unsorted(cursor, table):
         submission_time_col=sql.Identifier("submission_time"),
     )
     cursor.execute(query)
-    return cursor.fetchall()
+    data = cursor.fetchall()
+    return data
+
+
+@database_common.connection_handler
+def get_data_sorted(cursor):
+    query = sql.SQL(
+        """
+        SELECT *
+        FROM {table_name}
+        ORDER BY {submission_time_col}
+        DESC
+        LIMIT 5
+            """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        submission_time_col=sql.Identifier("submission_time"),
+    )
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data
+
+
+@database_common.connection_handler
+def get_all_data_for_id(cursor, table, element_id, el_id="id"):
+    result_list = []
+    query = sql.SQL(
+        """
+        SELECT *
+        FROM {table_name}
+        WHERE {id_col} = %(el_id)s
+            """
+    ).format(
+        table_name=sql.Identifier(table),
+        id_col=sql.Identifier(el_id)
+    )
+    cursor.execute(query, {"el_id": element_id})
+    result_list = cursor.fetchall()[0]
+    return result_list
 
 
 @database_common.connection_handler
@@ -45,7 +83,6 @@ def get_data_for_id(cursor, table, element_id, options, el_id="id"):
     data_dict = cursor.fetchall()
     for dictionary in data_dict:
         result_list = dictionary[options]
-
     return result_list
 
 
@@ -473,11 +510,10 @@ def create_tag(cursor, tag_name):
 
 @database_common.connection_handler
 def add_tag_to_question(cursor, question_id, tag_id):
-    print(f'q_id={question_id} and tag_id={tag_id} ')
     query = sql.SQL(
         """
-    INSERT INTO {table_name} ({id_col}, {tag_col})
-    VALUES (%(id_q)s, %(id_tag)s)
+        INSERT INTO {table_name} ({id_col}, {tag_col})
+        VALUES (%(id_q)s, %(id_tag)s)
         """
     ).format(
         table_name=sql.Identifier(ct.TABLE_QUESTION_TAG),
@@ -485,3 +521,45 @@ def add_tag_to_question(cursor, question_id, tag_id):
         tag_col=sql.Identifier("tag_id"),
     )
     cursor.execute(query, {"id_q": question_id, "id_tag": tag_id})
+
+
+# should return the id's of the questions where the string 'content' is found
+@database_common.connection_handler
+def search_database(cursor, content):
+    question_id_list = []
+    answer_id_list = []
+
+    query = sql.SQL(
+        """
+        SELECT {id_col} FROM {table_name}
+        WHERE {title_col} LIKE '%%'|| %(some_text)s ||'%%' 
+        OR {message_col} LIKE '%%'|| %(some_text)s ||'%%' 
+        """).format(
+            table_name=sql.Identifier(ct.TABLE_QUESTION),
+            id_col=sql.Identifier("id"),
+            title_col=sql.Identifier("title"),
+            message_col=sql.Identifier("message")
+        )
+    cursor.execute(query, {"some_text": content})
+
+    for el in cursor.fetchall():
+        question_id_list.append(el["id"])
+
+    # now search in answers
+
+    query = sql.SQL(
+        """
+        SELECT {q_id_col}, {a_id_col} FROM {table_name}
+        WHERE {message_col} LIKE '%%'|| %(some_text)s ||'%%' 
+        """).format(
+        table_name=sql.Identifier(ct.TABLE_ANSWER),
+        q_id_col=sql.Identifier("question_id"),
+        a_id_col=sql.Identifier("id"),
+        message_col=sql.Identifier("message")
+    )
+    cursor.execute(query, {"some_text": content})
+    for el in cursor.fetchall():
+        if el['question_id'] not in question_id_list:
+            question_id_list.append(el['question_id'])
+        answer_id_list.append(el['id'])
+    return question_id_list, answer_id_list

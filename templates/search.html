@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+</head>
+<body>
+    <h1>Searched Question List</h1>
+    <div id="questions">
+        {% for q_data in questions_data %}
+            <div class="highlighted">Question Title: {{ q_data.title }}</div><br>
+            <div class="highlighted">Question Message: {{ q_data.message }}</div><br>
+            {% for ans_data in answers_data %}
+                {% if ans_data.question_id == q_data.id %}
+                    <div class="highlighted indented">Answer Message:  {{ ans_data.message }}</div><br>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+ <a href="{{ url_for('route_list') }}">List all questions</a><br>
+</body>
+</html>

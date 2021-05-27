@@ -13,7 +13,24 @@ app.config["MAX_CONTENT_PATH"] = ct.MAX_PHOTO_SIZE
 
 @app.route("/")
 def route_home():
-    return render_template("home.html")
+    questions_data = data_handler.get_data_sorted()
+    return render_template('home.html', questions_data=questions_data)
+
+
+@app.route('/search')
+def search():
+    questions_data = []
+    answers_data = []
+
+    input_text = request.args.get('q')
+    question_id_list, answer_id_list = data_handler.search_database(input_text)
+
+    for question_id in question_id_list:
+        questions_data.append(data_handler.get_all_data_for_id(ct.TABLE_QUESTION, question_id))
+    for answer_id in answer_id_list:
+        answers_data.append(data_handler.get_all_data_for_id(ct.TABLE_ANSWER, answer_id))
+
+    return render_template('search.html', questions_data=questions_data, answers_data=answers_data)
 
 
 @app.route("/list")
@@ -35,6 +52,7 @@ def route_list():
             questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
     else:
         questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
+    print('sum thing ', questions[0]['title'])
     return render_template("list.html", questions=questions)
 
 
@@ -226,7 +244,7 @@ def add_answer_comment(answer_id):
     return render_template("answer_comment.html", answer_id=answer_id)
 
 
-@app.route('/comment/<comment_id>/edit', methods=['GET', 'POST'])
+@app.route("/comment/<comment_id>/edit", methods=['GET', 'POST'])
 def edit_comment_route(comment_id):
     requested_id = 'question_id'
     question_id = data_handler.get_option_id_with_comment_id(comment_id, requested_id)
@@ -251,11 +269,13 @@ def add_question_tag(question_id):
     if request.method == "POST":
         if request.form["tag"]:
             tag_name = request.form["tag"]
+            print('tagssss ', tag_name)
         else:
             tag_name = request.form["tag_name"]
+            data_handler.create_tag(tag_name)
 
         tag_id = data_handler.get_tag_id(tag_name)
-        print('tag id is ', tag_id)
+        print('tag name is ', tag_name)
         data_handler.add_tag_to_question(question_id, tag_id[0]['id'])
         return redirect(url_for("route_question", question_id=question_id))
     return render_template("tag_question.html", tags=tags_list, question_id=question_id)
@@ -278,6 +298,14 @@ def delete_comment_route(comment_id):
         question_id = data_handler.get_question_id_with_answer_id(answer_id)
     data_handler.delete_element(ct.TABLE_COMMENT, comment_id, "id")
     return redirect(url_for('route_question', question_id=question_id))
+
+
+# @app.route("/search?q=<search_phrase>")
+# def search_data_route(search_phrase):
+#     print('k')
+#     return redirect(url_for("route_list"))
+
+
 
 
 if __name__ == "__main__":

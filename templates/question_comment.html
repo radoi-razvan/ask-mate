@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Add New Question Comment</h1>
-    <form enctype="multipart/form-data" action="{{ url_for('add_question_comment', question_id = question_id) }}" method="post" >
+    <form enctype="multipart/form-data" action="{{ url_for('add_question_comment', search_phrase=search_phrase) }}" method="post" >
         <ul>
             <li>
                 <label for="message">Comment</label>

@@ -6,6 +6,20 @@
 </head>
 <body>
     <h1>Ask Mate</h1>
+    <h2>Latest 5 Questions</h2>
+    <ol>
+        {% for question in questions_data %}
+
+            <li>
+                <a href="{{ url_for('route_question',question_id=question.id) }}">{{ question.title }}</a>
+            </li>
+        {% endfor %}
+    </ol>
+    <h3>Search Questions</h3>
+    <form action="/search" method="get">
+      <input type="text" name="q" id="q" required>
+      <input type="submit" value="Search">
+    </form>
     <a href="{{ url_for('route_list') }}">List questions</a>
 </body>
 </html>
