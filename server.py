@@ -107,15 +107,9 @@ def add_new_question():
         for value in form_dict.values():
             question_list.append(value)
         file = request.files["file"]
-        if str(
-            file
-        ) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(
-            file.filename
-        ):
+        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename).replace(
-                "\\", "/"
-            )
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
             file.save(file_path)
             question_list.append(file_path)
         else:

@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add User Question</title>
-</head>
+{% extends "basic_common_template.html" %}
+{% block title %}Add question{% endblock %}
+{% block content %}
 <body>
     <h1>Add User Question</h1>
     <form enctype="multipart/form-data" action="{{ url_for('add_new_question') }}" method="post" >
+        <div class="container">
         <ul>
             <li>
                 <label for="title">Question</label>
@@ -34,9 +32,11 @@
                 <input type="submit" value="Post question"/>
             </li>
         </ul>
+        </div>
     </form>
 
 </body>
-</html>
+{% endblock %}
+
 
 

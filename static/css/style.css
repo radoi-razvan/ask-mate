@@ -8,15 +8,18 @@
     --transition-speed: 600ms;
 }
 
-head {
-    height: 0;
+
+ul {
+    list-style-type: none;
 }
 
 body {
     color: black;
     background-color: white;
     padding: 0;
-    margin: 0;
+    margin-top: 5rem;
+    margin-right: 5rem;
+    margin-left: 5rem;
 }
 
 body::-webkit-scrollbar {
@@ -34,6 +37,39 @@ body::-webkit-scrollbar-thumb {
 main {
   margin-left: 5rem;
   padding: 1rem;
+}
+
+input[type=submit] {
+    background-color: var(--bg-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+}
+
+input[type=submit]:hover {
+  opacity: 0.8;
+}
+
+input {
+    padding: 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+a:hover {
+    cursor: pointer;
+    }
+
+a {
+    text-decoration: none;
+    text-decoration-color: black;
+}
+
+input, label{
+    margin: 5px;
 }
 
 .navbar {

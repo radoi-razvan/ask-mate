@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add New Answer Comment</title>
-</head>
-<body>
-    <h1>Add New Answer Comment</h1>
-    <form enctype="multipart/form-data" action="{{ url_for('add_answer_comment', answer_id=answer_id) }}" method="post" >
-        <ul>
-            <li>
-                <label for="message">Comment</label>
-                <br>
-                <textarea rows="4" cols="60" name="message" required="required"></textarea>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <input type="submit" value="Post comment"/>
-            </li>
-        </ul>
-    </form>
-</body>
-</html>
+{% extends "common_template.html" %}
+{% block title %}Add New Answer Comment{% endblock %}
+{% block header %}Add New Answer Comment{% endblock %}
+{% block route %}{{ url_for('add_answer_comment', answer_id=answer_id) }}{% endblock %}
+{% block question_message_value %}
+    <label>Comment<br>
+        <textarea rows="4" cols="50" required name="message">{{ message }}</textarea>
+    </label>
+    <br><br>
+{% endblock %}
+{% block button_value %}value="Post comment"{% endblock %}

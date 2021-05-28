@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Add Question Tag</title>
-</head>
+{% extends "basic_common_template.html" %}
+{% block title %}Add Question Tag{% endblock %}
+{% block content %}
 <body>
     <h1>Add Question Tag</h1>
     <form enctype="multipart/form-data" action="{{ url_for('add_question_tag',tags=tags_list ,question_id=question_id) }}" method="post" >
+        <div class="container">
         <ul>
             <li>
                 <label for="tag"> Select a tag</label>
@@ -23,8 +21,10 @@
                 <input type="submit" value="Add tag"/>
             </li>
         </ul>
+        </div>
     </form>
     <form enctype="multipart/form-data" action="{{ url_for('add_question_tag',tags=tags_list ,question_id=question_id) }}" method="post" >
+        <div class="container">
         <ul>
             <li>
                 <label for="tag_name">Create a tag</label>
@@ -37,5 +37,8 @@
                 <input type="submit" value="Add tag"/>
             </li>
         </ul>
+        </div>
     </form>
 </body>
+{% endblock %}
+

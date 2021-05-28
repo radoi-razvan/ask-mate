@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Post an answer</title>
-</head>
+{% extends "basic_common_template.html" %}
+{% block title %}Post an answer{% endblock %}
+{% block content %}
 <body>
     <h1>Post an answer</h1>
     <form enctype="multipart/form-data" action="{{ url_for('add_new_answer', question_id=question_id) }}" method="post" >
+        <div class="container">
         <ul>
             <li>
                 <label for="message">Your answer</label>
@@ -27,7 +25,8 @@
                 <input type="submit" value="Post answer"/>
             </li>
         </ul>
+        </div>
     </form>
 
 </body>
-</html>
+{% endblock %}

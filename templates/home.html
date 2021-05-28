@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Home Page</title>
-</head>
+{% extends "basic_common_template.html" %}
+{% block title %}Add question{% endblock %}
+{% block content %}
 <body>
     <h1>Ask Mate</h1>
     <h2>Latest 5 Questions</h2>
@@ -17,9 +14,11 @@
     </ol>
     <h3>Search Questions</h3>
     <form action="/search" method="get">
-      <input type="text" name="q" id="q" required>
-      <input type="submit" value="Search">
+      <div class="container">
+        <input type="text" name="q" id="q" required>
+        <input type="submit" value="Search">
+      </div>
     </form>
     <a href="{{ url_for('route_list') }}">List questions</a>
 </body>
-</html>
+{% endblock %}

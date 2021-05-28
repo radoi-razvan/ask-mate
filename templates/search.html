@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Search</title>
-</head>
+{% extends "basic_common_template.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
 <body>
     <h1>Searched Question List</h1>
     <div id="questions">
@@ -19,4 +16,4 @@
     </div>
  <a href="{{ url_for('route_list') }}">List all questions</a><br>
 </body>
-</html>
+{% endblock %}
