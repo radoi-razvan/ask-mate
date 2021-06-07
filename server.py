@@ -112,23 +112,29 @@ def route_question(question_id):
 
 @app.route("/add-question", methods=["GET", "POST"])
 def add_new_question():
-    question_list = []
-    if request.method == "POST":
-        form_dict = request.form
-        for value in form_dict.values():
-            question_list.append(value)
-        file = request.files["file"]
-        if str(file) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
+    if "username" in session:
+        username = session["username"]
+        user_id = data_handler.check_users_field(username, "id")[0]["id"]
+        question_list = []
+        if request.method == "POST":
+            form_dict = request.form
+            for value in form_dict.values():
+                question_list.append(value)
+            file = request.files["file"]
+            if utils.allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
+                print(file_path)
 
-            file.save(file_path)
-            question_list.append(file_path)
-        else:
-            question_list.append("")
-        question_id = data_handler.post_question(question_list)
-        return redirect(url_for("route_question", question_id=question_id))
-    return render_template("add_question.html")
+                file.save(file_path)
+                question_list.append(file_path)
+            else:
+                question_list.append("")
+            question_list.append(user_id)
+            question_id = data_handler.post_question(question_list)
+            return redirect(url_for("route_question", question_id=question_id))
+        return render_template("add_question.html")
+    return redirect(url_for("route_home"))
 
 
 @app.route("/question/<question_id>/new-answer", methods=["GET", "POST"])

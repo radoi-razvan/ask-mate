@@ -89,8 +89,8 @@ def post_question(cursor, question_list):
     query = sql.SQL(
         """
         INSERT INTO {table_name} ({submission_time_col},{view_number_col},
-        {vote_number_col},{title_col},{message_col},{image_col})
-        VALUES(%(s_m)s, %(vote_n)s, %(view_n)s, %(t)s, %(m)s, %(i)s)
+        {vote_number_col},{title_col},{message_col},{image_col}, {user_id_col})
+        VALUES(%(s_m)s, %(vote_n)s, %(view_n)s, %(t)s, %(m)s, %(i)s, %(u_i)s)
             """
     ).format(
         table_name=sql.Identifier(ct.TABLE_QUESTION),
@@ -100,6 +100,7 @@ def post_question(cursor, question_list):
         title_col=sql.Identifier("title"),
         message_col=sql.Identifier("message"),
         image_col=sql.Identifier("image"),
+        user_id_col=sql.Identifier("user_id"),
     )
     cursor.execute(
         query,
@@ -110,6 +111,7 @@ def post_question(cursor, question_list):
             "t": question_list[0],
             "m": question_list[1],
             "i": question_list[2],
+            "u_i": question_list[3]
         },
     )
     query = sql.SQL(
