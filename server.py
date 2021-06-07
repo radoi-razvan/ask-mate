@@ -300,7 +300,5 @@ def delete_comment_route(comment_id):
 #     return redirect(url_for("route_list"))
 
 
-
-
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
