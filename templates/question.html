@@ -24,8 +24,10 @@
                     {% if comment_data['edited_count'] != None %}
                         Edited {{ comment_data['edited_count'] }} times
                     {% endif %}
-                    <a href="{{ url_for('edit_comment_route', comment_id=comment_data['id']) }}">Edit</a>
-                    <a href="{{ url_for('delete_comment_route', comment_id=comment_data['id']) }}">Delete</a>
+                    {% if username != None %}
+                        <a href="{{ url_for('edit_comment_route', comment_id=comment_data['id']) }}">Edit</a>
+                        <a href="{{ url_for('delete_comment_route', comment_id=comment_data['id']) }}">Delete</a>
+                    {% endif %}
                     </li>
             {% endfor %}
         </ul>
@@ -45,28 +47,33 @@
                                 {% if comment['edited_count'] != None %}
                                     Edited {{ comment['edited_count'] }} times
                                 {% endif %}</li>
-                                <a href="{{ url_for('edit_comment_route', comment_id=comment['id']) }}">Edit</a>
-                                <a href="{{ url_for('delete_comment_route', comment_id=comment['id']) }}">Delete</a>
+                                {% if username != None %}
+                                    <a href="{{ url_for('edit_comment_route', comment_id=comment['id']) }}">Edit</a>
+                                    <a href="{{ url_for('delete_comment_route', comment_id=comment['id']) }}">Delete</a>
+                                {% endif %}
                         {% endif %}
                     {% endfor %}
                 </ul>
                 <br>
-                <a href="{{ url_for('vote_up_answer_route', answer_id=answer['id']) }}">Like</a>
-                <a href="{{ url_for('vote_down_answer_route', answer_id=answer['id']) }}">Dislike</a>
-                <a href="{{ url_for('edit_answer_route', answer_id=answer['id']) }}">Edit answer</a><br>
-                <a href="{{ url_for('delete_answer_route', answer_id=answer['id']) }}">Delete answer</a><br>
-                <a href="{{ url_for('add_answer_comment', answer_id=answer['id']) }}">Add answer comment</a>
+                {% if username != None %}
+                    <a href="{{ url_for('vote_up_answer_route', answer_id=answer['id']) }}">Like</a>
+                    <a href="{{ url_for('vote_down_answer_route', answer_id=answer['id']) }}">Dislike</a>
+                    <a href="{{ url_for('edit_answer_route', answer_id=answer['id']) }}">Edit answer</a><br>
+                    <a href="{{ url_for('delete_answer_route', answer_id=answer['id']) }}">Delete answer</a><br>
+                    <a href="{{ url_for('add_answer_comment', answer_id=answer['id']) }}">Add answer comment</a>
+                {% endif %}
             {% endfor %}
         </ul>
         <a href="{{ url_for('route_list') }}">Back to question list</a><br>
-        <a href="{{ url_for('add_question_comment', question_id=question_id) }}">Add question comment</a><br>
-        <a href="{{ url_for('add_new_answer', question_id=question_id) }}">Add new answer</a><br>
-        <a href="{{ url_for('edit_question_route', question_id=question_id) }}">Edit question</a>
-        <a href="{{ url_for('delete_question_route', question_id=question_id) }}">Delete question</a><br>
-        <a href="{{ url_for('add_question_tag', question_id=question_id) }}">Add a tag</a>
-        {% if tag_id  %}
-            <a href="{{ url_for('delete_tag_route', question_id=question_id, tag_id=tag_id) }}">X</a>
+        {% if username != None %}
+            <a href="{{ url_for('add_question_comment', question_id=question_id) }}">Add question comment</a><br>
+            <a href="{{ url_for('add_new_answer', question_id=question_id) }}">Add new answer</a><br>
+            <a href="{{ url_for('edit_question_route', question_id=question_id) }}">Edit question</a>
+            <a href="{{ url_for('delete_question_route', question_id=question_id) }}">Delete question</a><br>
+            <a href="{{ url_for('add_question_tag', question_id=question_id) }}">Add a tag</a>
+            {% if tag_id  %}
+                <a href="{{ url_for('delete_tag_route', question_id=question_id, tag_id=tag_id) }}">X</a>
+            {% endif %}
         {% endif %}
-
     </body>
 {% endblock %}

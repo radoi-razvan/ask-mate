@@ -20,13 +20,17 @@
                     <td>{{ line.view_number }}</td>
                     <td>{{ line.vote_number }}</td>
                     <td>{{ line.submission_time }}</td>
-                    <td><a href="{{ url_for('vote_up_question_route',question_id=line.id) }}">Like</a></td>
-                    <td><a href="{{ url_for('vote_down_question_route',question_id=line.id) }}">Dislike</a></td>
+                    {% if username != None %}
+                        <td><a href="{{ url_for('vote_up_question_route',question_id=line.id) }}">Like</a></td>
+                        <td><a href="{{ url_for('vote_down_question_route',question_id=line.id) }}">Dislike</a></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('add_new_question') }}">Add a question</a><br>
+        {% if username != None %}
+            <a href="{{ url_for('add_new_question') }}">Add a question</a><br>
+        {% endif %}
         <a href="{{ url_for('route_home') }}">Back to home</a><br>
     </body>
 {% endblock %}

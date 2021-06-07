@@ -1,0 +1,32 @@
+{% extends "basic_common_template.html" %}
+{% block title %}Users Page{% endblock %}
+{% block content %}
+<body>
+    <h1>Users</h1>
+    <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Registration Date</th>
+                    <th>Asked Questions</th>
+                    <th>Posted Answers</th>
+                    <th>Posted Comments</th>
+                    <th>Reputation</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in users_data %}
+                <tr>
+                    <td>{{ line.name }}</td>
+                    <td>{{ line.registration_date }}</td>
+                    <td>{{ line.count_of_asked_questions }}</td>
+                    <td>{{ line.count_of_answers }}</td>
+                    <td>{{ line.count_of_comments }}</td>
+                    <td>{{ line.reputation }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('route_home') }}">Back to home</a><br>
+</body>
+{% endblock %}

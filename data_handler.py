@@ -11,18 +11,13 @@ import database_common
 
 
 @database_common.connection_handler
-def get_data_unsorted(cursor, table):
-    query = sql.SQL(
-        """
+def get_data_unsorted(cursor, table, option="submission_time", sort_option="DESC"):
+    query = f"""
         SELECT *
-        FROM {table_name}
-        ORDER BY {submission_time_col}
-        DESC
+        FROM {table}
+        ORDER BY {option}
+        {sort_option}
             """
-    ).format(
-        table_name=sql.Identifier(table),
-        submission_time_col=sql.Identifier("submission_time"),
-    )
     cursor.execute(query)
     data = cursor.fetchall()
     return data
@@ -563,3 +558,45 @@ def search_database(cursor, content):
             question_id_list.append(el['question_id'])
         answer_id_list.append(el['id'])
     return question_id_list, answer_id_list
+
+
+@database_common.connection_handler
+def check_users_field(cursor, value, options):
+    query = sql.SQL(
+        """
+        SELECT {field_col}
+        FROM {table_name}
+        WHERE {username_col} = %(u_f)s
+        """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_USERS),
+        field_col=sql.Identifier(options),
+        username_col=sql.Identifier("name")
+    )
+    cursor.execute(query, {"u_f": value})
+    data = cursor.fetchall()
+    return data
+
+
+@database_common.connection_handler
+def add_user(cursor, user_name, password):
+    registration_date = ut.get_formatted_time(round(time.time()))
+    query = sql.SQL (
+        """
+        INSERT INTO {table_name} ({name_col},{password_col},
+        {registration_date_col},{count_of_asked_questions_col},
+        {count_of_answers_col},{count_of_comments_col},{reputation_col})
+        VALUES(%(u_n)s, %(p)s, %(r_d)s, 0, 0, 0, 0)
+        """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_USERS),
+        name_col=sql.Identifier("name"),
+        password_col=sql.Identifier("password"),
+        registration_date_col=sql.Identifier("registration_date"),
+        count_of_asked_questions_col=sql.Identifier("count_of_asked_questions"),
+        count_of_answers_col=sql.Identifier("count_of_answers"),
+        count_of_comments_col=sql.Identifier("count_of_comments"),
+        reputation_col=sql.Identifier("reputation"),
+    )
+    cursor.execute(query, {"u_n": user_name, "p": password, "r_d": registration_date})
+    return "ok"

@@ -3,6 +3,13 @@
 {% block content %}
 <body>
     <h1>Ask Mate</h1>
+    {% if username != None %}
+        <a href="{{ url_for('logout') }}">Logout</a><br>
+        <a href="{{ url_for('users') }}">List Users</a><br>
+    {% else %}
+        <a href="{{ url_for('registration_route') }}">Signup</a>
+        <a href="{{ url_for('login') }}">Login</a>
+    {% endif %}
     <h2>Latest 5 Questions</h2>
     <ol>
         {% for question in questions_data %}

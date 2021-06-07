@@ -1,20 +1,24 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from helpers import constants as ct
 from helpers import utils
 import data_handler
+import cryptography as cy
 
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = ct.UPLOAD_FOLDER
 app.config["MAX_CONTENT_PATH"] = ct.MAX_PHOTO_SIZE
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route("/")
 def route_home():
     questions_data = data_handler.get_data_sorted()
-    return render_template('home.html', questions_data=questions_data)
+    if "username" in session:
+        return render_template('home.html', questions_data=questions_data, username=session["username"])
+    return render_template('home.html', questions_data=questions_data, username=None)
 
 
 @app.route('/search')
@@ -52,13 +56,19 @@ def route_list():
             questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
     else:
         questions = data_handler.get_data_unsorted(ct.TABLE_QUESTION)
-    print('sum thing ', questions[0]['title'])
-    return render_template("list.html", questions=questions)
+    if "username" in session:
+        username = session["username"]
+    else:
+        username = None
+    return render_template("list.html", questions=questions, username=username)
 
 
 @app.route("/question/<question_id>")
 def route_question(question_id):
-
+    if "username" in session:
+        username = session["username"]
+    else:
+        username = None
     data_handler.increment_view_number(question_id)
 
     question_message_content = data_handler.get_data_for_id(
@@ -95,7 +105,8 @@ def route_question(question_id):
         comments_data=question_comments_data,
         all_comments_data=all_comments_data,
         question_tag=tag_name,
-        tag_id=tag_id
+        tag_id=tag_id,
+        username=username
     )
 
 
@@ -110,6 +121,7 @@ def add_new_question():
         if str(file) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename).replace('\\', '/')
+
             file.save(file_path)
             question_list.append(file_path)
         else:
@@ -298,6 +310,52 @@ def delete_comment_route(comment_id):
 # def search_data_route(search_phrase):
 #     print('k')
 #     return redirect(url_for("route_list"))
+
+
+@app.route('/registration', methods=["GET", "POST"])
+def registration_route():
+    if request.method == "POST":
+        user_name = request.form["username"]
+        password = request.form["password"]
+        if not data_handler.check_users_field(user_name,"name") and len(user_name) > 5 and len(password) > 5:
+            password = cy.hash_password(password)
+            if data_handler.add_user(user_name, password) == "ok":
+                session.update({ "username": user_name })
+        return redirect(url_for("login"))
+    return render_template("registration.html")
+
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('route_home'))
+
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        try:
+            if username == data_handler.check_users_field(username, "name")[0]["name"] and cy.verify_password(password, data_handler.check_users_field(username, "password")[0]["password"]):
+                session.update({'username': username})
+                return redirect(url_for("route_home"))
+            else:
+                return render_template("login.html", message="Invalid login")
+        except:
+            return render_template("login.html", message="Invalid login")
+    return render_template("login.html", message=None)
+
+
+@app.route('/users')
+def users():
+    if "username" in session:
+        username = session["username"]
+        users_data = data_handler.get_data_unsorted(ct.TABLE_USERS, "registration_date")
+        return render_template("users.html", users_data=users_data)
+    return redirect(url_for("route_home"))
+
 
 
 if __name__ == "__main__":
