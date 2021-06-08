@@ -17,7 +17,7 @@
             <tbody>
                 {% for line in users_data %}
                 <tr>
-                    <td>{{ line.name }}</td>
+                    <td><a href="{{ url_for('user_profile',user_id=line.id) }}">{{ line.name }}</a></td>
                     <td>{{ line.registration_date }}</td>
                     <td>{{ line.count_of_asked_questions }}</td>
                     <td>{{ line.count_of_answers }}</td>

@@ -34,7 +34,20 @@
         <h3>Answers:</h3>
         <ul>
             {% for answer in answers_data %}
-                <li>{{ answer['message'] }}</li>
+                <li>{{ answer['message'] }} {% if user_id == question_data["user_id"] %}
+                        <form action="{{ url_for("accepted", question_id=question_id, answer_id=answer["id"]) }}" method="post">
+                            {% if  answer["id"] == accepted_answer_id %}
+                                <label for="accepted"></label>
+                                <input type="checkbox" name="accepted" checked value="{{ None }}"/>
+                                <button type="submit">Unmark</button>
+                            {% else %}
+                                <label for="accepted"></label>
+                                <input type="checkbox" name="accepted" value="{{ answer["id"] }}" required/>
+                                <button type="submit">Mark</button>
+                            {% endif %}
+                        </form>
+                    {% endif %}
+                </li>
                 {% if answer['image'] != None %}
                     <img src= "{{ "/" + answer['image'] }}" width="200" height="200">
                 {% endif %}

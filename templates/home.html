@@ -6,6 +6,7 @@
     {% if username != None %}
         <a href="{{ url_for('logout') }}">Logout</a><br>
         <a href="{{ url_for('users') }}">List Users</a><br>
+        <a href="{{ url_for('user_profile',user_id=user_id) }}">Profile</a><br>
     {% else %}
         <a href="{{ url_for('registration_route') }}">Signup</a>
         <a href="{{ url_for('login') }}">Login</a>

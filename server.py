@@ -17,7 +17,9 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 def route_home():
     questions_data = data_handler.get_data_sorted()
     if "username" in session:
-        return render_template('home.html', questions_data=questions_data, username=session["username"])
+        username = session["username"]
+        user_id = data_handler.get_user_column(username, "id")[0]["id"]
+        return render_template('home.html', questions_data=questions_data, username=username, user_id=user_id)
     return render_template('home.html', questions_data=questions_data, username=None)
 
 
@@ -30,9 +32,9 @@ def search():
     question_id_list, answer_id_list = data_handler.search_database(input_text)
 
     for question_id in question_id_list:
-        questions_data.append(data_handler.get_all_data_for_id(ct.TABLE_QUESTION, question_id))
+        questions_data.append(data_handler.get_all_data_for_id(ct.TABLE_QUESTION, question_id)[0])
     for answer_id in answer_id_list:
-        answers_data.append(data_handler.get_all_data_for_id(ct.TABLE_ANSWER, answer_id))
+        answers_data.append(data_handler.get_all_data_for_id(ct.TABLE_ANSWER, answer_id)[0])
 
     return render_template('search.html', questions_data=questions_data, answers_data=answers_data)
 
@@ -92,9 +94,11 @@ def route_question(question_id):
         tag_name = data_handler.get_data_for_id(ct.TABLE_TAG, tag_id, "name")
     else:
         tag_name = None
-    print('tag_id', tag_id)
     if not tag_id:
         tag_id = None
+    accepted_answer_id = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, "accepted_answer_id", el_id="id")
+    # print(accepted_answer_id)
+    # print(answers_data[0]["id"])
     return render_template(
         "question.html",
         question_id=question_id,
@@ -106,7 +110,8 @@ def route_question(question_id):
         all_comments_data=all_comments_data,
         question_tag=tag_name,
         tag_id=tag_id,
-        username=username
+        username=username,
+        accepted_answer_id=accepted_answer_id
     )
 
 
@@ -114,7 +119,7 @@ def route_question(question_id):
 def add_new_question():
     if "username" in session:
         username = session["username"]
-        user_id = data_handler.check_users_field(username, "id")[0]["id"]
+        user_id = data_handler.get_user_column(username, "id")[0]["id"]
         question_list = []
         if request.method == "POST":
             form_dict = request.form
@@ -141,7 +146,7 @@ def add_new_question():
 def add_new_answer(question_id):
     if "username" in session:
         username = session["username"]
-        user_id = data_handler.check_users_field(username, "id")[0]["id"]
+        user_id = data_handler.get_user_column(username, "id")[0]["id"]
         answer_list = []
         if request.method == "POST":
             form_dict = request.form
@@ -192,12 +197,9 @@ def edit_question_route(question_id):
 @app.route('/answer/<answer_id>/edit', methods=['GET', 'POST'])
 def edit_answer_route(answer_id):
     question_id = data_handler.get_question_id_with_answer_id(answer_id)
-    print('first q_id ', question_id)
     if request.method == 'POST':
-        print('okkk')
         answer_message = request.form['message']
         data_handler.edit_answer(answer_id, answer_message)
-        print('question id is ', question_id)
         return redirect(url_for('route_question', question_id=question_id))
     message = data_handler.get_data_for_id(ct.TABLE_ANSWER, answer_id, 'message')
     return render_template('edit_answer.html', answer_id=answer_id, message=message)
@@ -211,44 +213,55 @@ def delete_answer_route(answer_id):
 
 @app.route("/question/<question_id>/vote_up")
 def vote_up_question_route(question_id):
-    vote_type = 1
-    data_handler.count_vote(ct.TABLE_QUESTION, question_id, vote_type)
-    return redirect(url_for("route_list"))
+    if "username" in session:
+        username = session["username"]
+        vote_type = 1
+        user_id = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, "user_id", el_id="id")
+        data_handler.count_vote(ct.TABLE_QUESTION, question_id, vote_type, user_id)
+        return redirect(url_for("route_list"))
+    return redirect(url_for("route_home"))
 
 
 @app.route("/question/<question_id>/vote_down")
 def vote_down_question_route(question_id):
-    vote_type = -1
-    data_handler.count_vote(ct.TABLE_QUESTION, question_id, vote_type)
-    return redirect(url_for("route_list"))
+    if "username" in session:
+        username = session["username"]
+        vote_type = -1
+        data_handler.count_vote(ct.TABLE_QUESTION, question_id, vote_type)
+        return redirect(url_for("route_list"))
+    return redirect(url_for("route_home"))
 
 
 @app.route("/answer/<answer_id>/vote_up")
 def vote_up_answer_route(answer_id):
-    vote_type = 1
-    data_handler.count_vote(ct.TABLE_ANSWER, answer_id, vote_type)
-    question_id = data_handler.get_question_id_with_answer_id(answer_id)
-    return redirect(url_for("route_question", question_id=question_id))
+    if "username" in session:
+        username = session["username"]
+        vote_type = 1
+        question_id = data_handler.get_question_id_with_answer_id(answer_id)
+        user_id = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, "user_id", el_id="id")
+        data_handler.count_vote(ct.TABLE_ANSWER, answer_id, vote_type, user_id)
+        return redirect(url_for("route_question", question_id=question_id))
+    return redirect(url_for("route_home"))
 
 
 @app.route("/answer/<answer_id>/vote_down")
 def vote_down_answer_route(answer_id):
-    vote_type = -1
-    data_handler.count_vote(ct.TABLE_ANSWER, answer_id, vote_type)
-    question_id = data_handler.get_question_id_with_answer_id(answer_id)
-    return redirect(url_for("route_question", question_id=question_id))
+    if "username" in session:
+        username = session["username"]
+        vote_type = -1
+        data_handler.count_vote(ct.TABLE_ANSWER, answer_id, vote_type)
+        question_id = data_handler.get_question_id_with_answer_id(answer_id)
+        return redirect(url_for("route_question", question_id=question_id))
+    return redirect(url_for("route_home"))
 
 
 @app.route("/question/<question_id>/new-comment", methods=["GET", "POST"])
 def add_question_comment(question_id):
-    print("question id is ", question_id)
     if "username" in session:
         username = session["username"]
-        user_id = data_handler.check_users_field(username, "id")[0]["id"]
+        user_id = data_handler.get_user_column(username, "id")[0]["id"]
         if request.method == "POST":
-            print("ok123")
             comment_message = request.form["message"]
-            print("comment mess is ", comment_message)
             data_handler.post_comment(question_id, None, comment_message, user_id)
             return redirect(url_for("route_question", question_id=question_id))
         return render_template("question_comment.html", question_id=question_id)
@@ -259,8 +272,10 @@ def add_question_comment(question_id):
 def add_answer_comment(answer_id):
     question_id = data_handler.get_question_id_with_answer_id(answer_id)
     if request.method == "POST":
+        username = session["username"]
+        user_id = data_handler.get_user_column(username, "id")[0]["id"]
         comment_message = request.form['message']
-        data_handler.post_comment(None, answer_id, comment_message)
+        data_handler.post_comment(None, answer_id, comment_message, user_id)
         return redirect(url_for("route_question", question_id=question_id))
     return render_template("answer_comment.html", answer_id=answer_id)
 
@@ -274,7 +289,6 @@ def edit_comment_route(comment_id):
         answer_id = data_handler.get_option_id_with_comment_id(comment_id, requested_id)
         # find question id with answer id
         question_id = data_handler.get_question_id_with_answer_id(answer_id)
-    print('question_id ', question_id)
     if request.method == 'POST':
         comment_message = request.form['message']
         data_handler.increment_edited_count(comment_id)
@@ -290,13 +304,11 @@ def add_question_tag(question_id):
     if request.method == "POST":
         try:
             tag_name = request.form["tag"]
-            print('tagssss ', tag_name)
         except:
             tag_name = request.form["tag_name"]
             data_handler.create_tag(tag_name)
 
         tag_id = data_handler.get_tag_id(tag_name)
-        print('tag name is ', tag_name)
         data_handler.add_tag_to_question(question_id, tag_id[0]['id'])
         return redirect(url_for("route_question", question_id=question_id))
     return render_template("tag_question.html", tags=tags_list, question_id=question_id)
@@ -332,7 +344,7 @@ def registration_route():
     if request.method == "POST":
         user_name = request.form["username"]
         password = request.form["password"]
-        if not data_handler.check_users_field(user_name,"name") and len(user_name) > 5 and len(password) > 5:
+        if not data_handler.get_user_column(user_name, "name") and len(user_name) > 5 and len(password) > 5:
             password = cy.hash_password(password)
             if data_handler.add_user(user_name, password) == "ok":
                 session.update({ "username": user_name })
@@ -353,7 +365,7 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         try:
-            if username == data_handler.check_users_field(username, "name")[0]["name"] and cy.verify_password(password, data_handler.check_users_field(username, "password")[0]["password"]):
+            if username == data_handler.get_user_column(username, "name")[0]["name"] and cy.verify_password(password, data_handler.get_user_column(username, "password")[0]["password"]):
                 session.update({'username': username})
                 return redirect(url_for("route_home"))
             else:
@@ -371,6 +383,34 @@ def users():
         return render_template("users.html", users_data=users_data)
     return redirect(url_for("route_home"))
 
+
+@app.route('/user/<user_id>')
+def user_profile(user_id):
+    if "username" in session:
+        username = session["username"]
+        user_data = data_handler.get_all_data_for_id(ct.TABLE_USERS, user_id, el_id="id")[0]
+        question_data = data_handler.get_all_data_for_id(ct.TABLE_QUESTION, user_id, el_id="user_id")
+        answer_data = data_handler.get_all_data_for_id(ct.TABLE_ANSWER, user_id, el_id="user_id")
+        comment_data = data_handler.get_all_data_for_id(ct.TABLE_COMMENT, user_id, el_id="user_id")
+        comments = []
+        for comment in comment_data:
+            if comment["question_id"] is None:
+                question_id = data_handler.get_question_id_with_answer_id(comment["answer_id"])
+                comment["question_id"] = question_id
+            comments.append(comment)
+        return render_template("user_profile.html", user_data=user_data, question_data=question_data, answer_data=answer_data, comment_data=comments)
+    return redirect(url_for("route_home"))
+
+
+@app.route('/<question_id>/<answer_id>/accepted' , methods=["GET", "POST"])
+def accepted(question_id, answer_id):
+    if "username" in session:
+        username = session["username"]
+        form_value = request.form["accepted"]
+        user_id = data_handler.get_data_for_id(ct.TABLE_ANSWER, answer_id, "user_id", el_id="id")
+        data_handler.add_accepted_answer(question_id, form_value, user_id)
+        return redirect(url_for("route_question", question_id=question_id))
+    return redirect(url_for("route_home"))
 
 
 if __name__ == "__main__":

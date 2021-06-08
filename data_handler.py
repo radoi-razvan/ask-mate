@@ -56,7 +56,7 @@ def get_all_data_for_id(cursor, table, element_id, el_id="id"):
         id_col=sql.Identifier(el_id)
     )
     cursor.execute(query, {"el_id": element_id})
-    result_list = cursor.fetchall()[0]
+    result_list = cursor.fetchall()
     return result_list
 
 
@@ -287,7 +287,11 @@ def delete_question(cursor, question_id):
 
 
 @database_common.connection_handler
-def count_vote(cursor, table, element_id, vote):
+def count_vote(cursor, table, element_id, vote, user_id=None):
+    if table == ct.TABLE_QUESTION:
+        reputation = 5
+    if table == ct.TABLE_ANSWER:
+        reputation = 10
     query = sql.SQL(
         """
         UPDATE {table_name}
@@ -297,7 +301,7 @@ def count_vote(cursor, table, element_id, vote):
     ).format(
         table_name=sql.Identifier(table),
         vote_number_col=sql.Identifier("vote_number"),
-        id_col=sql.Identifier("id"),
+        id_col=sql.Identifier("id")
     )
     cursor.execute(
         query,
@@ -306,6 +310,20 @@ def count_vote(cursor, table, element_id, vote):
             element_id,
         ),
     )
+    query = sql.SQL(
+        """
+        UPDATE {table_name}
+        SET {reputation_col} = {reputation_col} + %s
+        WHERE {id_col} = %s
+            """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_USERS),
+        reputation_col=sql.Identifier("reputation"),
+        id_col=sql.Identifier("id")
+    )
+    cursor.execute(query, (reputation, user_id, ), )
+
+
 
 
 @database_common.connection_handler
@@ -566,7 +584,7 @@ def search_database(cursor, content):
 
 
 @database_common.connection_handler
-def check_users_field(cursor, value, options):
+def get_user_column(cursor, value, options):
     query = sql.SQL(
         """
         SELECT {field_col}
@@ -605,3 +623,35 @@ def add_user(cursor, user_name, password):
     )
     cursor.execute(query, {"u_n": user_name, "p": password, "r_d": registration_date})
     return "ok"
+
+
+@database_common.connection_handler
+def add_accepted_answer(cursor, question_id, answer_id, user_id):
+    reputation = 15
+    if answer_id == "None":
+        answer_id = None
+        reputation = -15
+    query = sql.SQL(
+        """
+        UPDATE {table_name} 
+        SET {accepted_answer_id_col} = %(a_i)s
+        WHERE {question_id_col} = %(q_i)s
+        """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        accepted_answer_id_col=sql.Identifier("accepted_answer_id"),
+        question_id_col=sql.Identifier("id")
+    )
+    cursor.execute(query, {"q_i": question_id, "a_i": answer_id})
+    query = sql.SQL(
+        """
+        UPDATE {table_name}
+        SET {reputation_col} = {reputation_col} + %s
+        WHERE {id_col} = %s
+            """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_USERS),
+        reputation_col=sql.Identifier("reputation"),
+        id_col=sql.Identifier("id")
+    )
+    cursor.execute(query, (reputation, user_id,), )
