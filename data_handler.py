@@ -158,8 +158,8 @@ def post_answer(cursor, question_id, answer):
     query = sql.SQL(
         """
         INSERT INTO {table_name} ({submission_time_col},{vote_number_col},
-        {question_id_col},{message_col},{image_col})
-        VALUES(%(s_m)s, %(vote_n)s, %(q_i)s, %(m)s, %(i)s)
+        {question_id_col},{message_col},{image_col},{user_id_col})
+        VALUES(%(s_m)s, %(vote_n)s, %(q_i)s, %(m)s, %(i)s, %(u_id)s)
             """
     ).format(
         table_name=sql.Identifier(ct.TABLE_ANSWER),
@@ -169,6 +169,7 @@ def post_answer(cursor, question_id, answer):
         question_id_col=sql.Identifier("question_id"),
         message_col=sql.Identifier("message"),
         image_col=sql.Identifier("image"),
+        user_id_col=sql.Identifier("user_id"),
     )
     cursor.execute(
         query,
@@ -178,6 +179,7 @@ def post_answer(cursor, question_id, answer):
             "q_i": question_id,
             "m": answer[0],
             "i": answer[1],
+            "u_id": answer[2]
         },
     )
     query = sql.SQL(
@@ -398,12 +400,12 @@ def get_all_comments(cursor):
 
 
 @database_common.connection_handler
-def post_comment(cursor, question_id, answer_id, content):
+def post_comment(cursor, question_id, answer_id, content, user_id):
     print('content is ', content)
     post_time = ut.get_formatted_time(round(time.time()))
     query = """
-        INSERT INTO comment (question_id,answer_id,message,submission_time,edited_count)
-        VALUES (%(q_id)s, %(a_id)s, %(message)s, %(submission_time)s, %(edited_count)s)
+        INSERT INTO comment (question_id,answer_id,message,submission_time,edited_count,user_id)
+        VALUES (%(q_id)s, %(a_id)s, %(message)s, %(submission_time)s, %(edited_count)s, %(u_id)s)
             """
     cursor.execute(
         query,
@@ -413,6 +415,7 @@ def post_comment(cursor, question_id, answer_id, content):
             "message": content,
             "submission_time": post_time,
             "edited_count": None,
+            "u_id": user_id
         },
     )
 

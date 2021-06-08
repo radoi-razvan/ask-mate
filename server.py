@@ -139,28 +139,33 @@ def add_new_question():
 
 @app.route("/question/<question_id>/new-answer", methods=["GET", "POST"])
 def add_new_answer(question_id):
-    answer_list = []
-    if request.method == "POST":
-        form_dict = request.form
-        for value in form_dict.values():
-            answer_list.append(value)
-        file = request.files["file"]
-        if str(
-            file
-        ) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(
-            file.filename
-        ):
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename).replace(
-                "\\", "/"
-            )
-            file.save(file_path)
-            answer_list.append(file_path)
-        else:
-            answer_list.append("")
-        data_handler.post_answer(question_id, answer_list)
-        return redirect(url_for("route_question", question_id=question_id))
-    return render_template("post_answer.html", question_id=question_id)
+    if "username" in session:
+        username = session["username"]
+        user_id = data_handler.check_users_field(username, "id")[0]["id"]
+        answer_list = []
+        if request.method == "POST":
+            form_dict = request.form
+            for value in form_dict.values():
+                answer_list.append(value)
+            file = request.files["file"]
+            if str(
+                file
+            ) != "<FileStorage: '' ('application/octet-stream')>" and utils.allowed_file(
+                file.filename
+            ):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename).replace(
+                    "\\", "/"
+                )
+                file.save(file_path)
+                answer_list.append(file_path)
+            else:
+                answer_list.append("")
+            answer_list.append(user_id)
+            data_handler.post_answer(question_id, answer_list)
+            return redirect(url_for("route_question", question_id=question_id))
+        return render_template("post_answer.html", question_id=question_id)
+    return redirect(url_for("route_home"))
 
 
 @app.route("/question/<question_id>/delete")
@@ -237,13 +242,17 @@ def vote_down_answer_route(answer_id):
 @app.route("/question/<question_id>/new-comment", methods=["GET", "POST"])
 def add_question_comment(question_id):
     print("question id is ", question_id)
-    if request.method == "POST":
-        print("ok123")
-        comment_message = request.form["message"]
-        print("comment mess is ", comment_message)
-        data_handler.post_comment(question_id, None, comment_message)
-        return redirect(url_for("route_question", question_id=question_id))
-    return render_template("question_comment.html", question_id=question_id)
+    if "username" in session:
+        username = session["username"]
+        user_id = data_handler.check_users_field(username, "id")[0]["id"]
+        if request.method == "POST":
+            print("ok123")
+            comment_message = request.form["message"]
+            print("comment mess is ", comment_message)
+            data_handler.post_comment(question_id, None, comment_message, user_id)
+            return redirect(url_for("route_question", question_id=question_id))
+        return render_template("question_comment.html", question_id=question_id)
+    return redirect(url_for("route_home"))
 
 
 @app.route("/answer/<answer_id>/new-comment", methods=["GET", "POST"])
