@@ -1,11 +1,20 @@
-{% extends "basic_common_template.html" %}
+{% extends "root_template.html" %}
 {% block title %}Question{% endblock %}
-{% block content %}
-    <body>
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
         <h1>Question</h1>
         <h2>{{ title }}</h2>
-        {% if question_tag  %}
-            <p>{{ question_tag }}</p>
+        {% if question_tags_list != []  %}
+            {% for tag_data in question_tags_list %}
+                 <p>#{{ tag_data.tag_name }}    <a href="{{ url_for('delete_tag_route', question_id=question_id, tag_id=tag_data.tag_id) }}">x</a></p>
+            {% endfor %}
         {% endif %}
         {% if question_image_path != None %}
                 <img src= "{{ "/" + question_image_path }}" width="200" height="200">
@@ -84,9 +93,5 @@
             <a href="{{ url_for('edit_question_route', question_id=question_id) }}">Edit question</a>
             <a href="{{ url_for('delete_question_route', question_id=question_id) }}">Delete question</a><br>
             <a href="{{ url_for('add_question_tag', question_id=question_id) }}">Add a tag</a>
-            {% if tag_id  %}
-                <a href="{{ url_for('delete_tag_route', question_id=question_id, tag_id=tag_id) }}">X</a>
-            {% endif %}
         {% endif %}
-    </body>
 {% endblock %}

@@ -11,11 +11,11 @@ import database_common
 
 
 @database_common.connection_handler
-def get_data_unsorted(cursor, table, option="submission_time", sort_option="DESC"):
+def get_data_unsorted(cursor, table, order_by="submission_time", sort_option="DESC"):
     query = f"""
         SELECT *
         FROM {table}
-        ORDER BY {option}
+        ORDER BY {order_by}
         {sort_option}
             """
     cursor.execute(query)
@@ -82,7 +82,7 @@ def get_data_for_id(cursor, table, element_id, options, el_id="id"):
 
 
 @database_common.connection_handler
-def post_question(cursor, question_list):
+def post_question(cursor, question_list, user_id):
     if question_list[2] == "":
         question_list[2] = None
     post_time = ut.get_formatted_time(round(time.time()))
@@ -114,6 +114,9 @@ def post_question(cursor, question_list):
             "u_i": question_list[3]
         },
     )
+
+    count_user_xp(user_id, "count_of_asked_questions", reputation=1)
+
     query = sql.SQL(
         """
             SELECT MAX({id_col})
@@ -151,7 +154,7 @@ def get_answers(question_id):
 
 
 @database_common.connection_handler
-def post_answer(cursor, question_id, answer):
+def post_answer(cursor, question_id, answer, user_id):
     if answer[1] == "":
         answer[1] = None
     post_time = ut.get_formatted_time(round(time.time()))
@@ -182,6 +185,9 @@ def post_answer(cursor, question_id, answer):
             "u_id": answer[2]
         },
     )
+
+    count_user_xp(user_id, "count_of_answers", reputation=1)
+
     query = sql.SQL(
         """
             SELECT MAX({id_col})
@@ -253,7 +259,7 @@ def edit_question(cursor, question_id, question_data):
 
 
 @database_common.connection_handler
-def delete_answer(cursor, answer_id):
+def delete_answer(cursor, answer_id, user_id):
     question_id = get_question_id_with_answer_id(answer_id)
     query = sql.SQL(
         """
@@ -262,11 +268,12 @@ def delete_answer(cursor, answer_id):
             """
     ).format(table_name=sql.Identifier(ct.TABLE_ANSWER), id_col=sql.Identifier("id"))
     cursor.execute(query, (answer_id,))
+    count_user_xp(user_id, "count_of_answers", reputation=-1)
     return question_id
 
 
 @database_common.connection_handler
-def delete_question(cursor, question_id):
+def delete_question(cursor, question_id, user_id):
     query = sql.SQL(
         """
         DELETE FROM {table_name}
@@ -283,15 +290,20 @@ def delete_question(cursor, question_id):
         table_name=sql.Identifier(ct.TABLE_ANSWER),
         question_id_col=sql.Identifier("question_id"),
     )
+    count_user_xp(user_id, "count_of_asked_questions", reputation=-1)
     cursor.execute(query, (question_id,))
 
 
 @database_common.connection_handler
-def count_vote(cursor, table, element_id, vote, user_id=None):
-    if table == ct.TABLE_QUESTION:
-        reputation = 5
-    if table == ct.TABLE_ANSWER:
-        reputation = 10
+def count_vote(cursor, table, element_id, vote, user_id):
+    reputation = 0
+    if vote == 1:
+        if table == ct.TABLE_QUESTION:
+            reputation = 5
+        if table == ct.TABLE_ANSWER:
+            reputation = 10
+    if vote == -1:
+        reputation = -2
     query = sql.SQL(
         """
         UPDATE {table_name}
@@ -310,20 +322,8 @@ def count_vote(cursor, table, element_id, vote, user_id=None):
             element_id,
         ),
     )
-    query = sql.SQL(
-        """
-        UPDATE {table_name}
-        SET {reputation_col} = {reputation_col} + %s
-        WHERE {id_col} = %s
-            """
-    ).format(
-        table_name=sql.Identifier(ct.TABLE_USERS),
-        reputation_col=sql.Identifier("reputation"),
-        id_col=sql.Identifier("id")
-    )
-    cursor.execute(query, (reputation, user_id, ), )
-
-
+    print("reputation = ", reputation)
+    count_user_xp(user_id, "reputation", reputation)
 
 
 @database_common.connection_handler
@@ -436,10 +436,11 @@ def post_comment(cursor, question_id, answer_id, content, user_id):
             "u_id": user_id
         },
     )
+    count_user_xp(user_id, "count_of_comments", reputation=1)
 
 
 @database_common.connection_handler
-def delete_element(cursor, table_name, element_id, options):
+def delete_comment(cursor, table_name, element_id, options, user_id):
     query = sql.SQL(
         """
         DELETE FROM {table_name}
@@ -447,6 +448,7 @@ def delete_element(cursor, table_name, element_id, options):
             """
     ).format(table_name=sql.Identifier(table_name), id_col=sql.Identifier(options))
     cursor.execute(query, (element_id,))
+    count_user_xp(user_id, "count_of_comments", reputation=-1)
 
 
 @database_common.connection_handler
@@ -541,6 +543,35 @@ def add_tag_to_question(cursor, question_id, tag_id):
     cursor.execute(query, {"id_q": question_id, "id_tag": tag_id})
 
 
+@database_common.connection_handler
+def delete_tag(cursor, table_name, question_id, tag_id):
+    query = sql.SQL(
+        """
+        DELETE FROM {table_name}
+        WHERE {id_col} = %s 
+        AND {tag_col} = %s
+        """
+    ).format(
+        table_name=sql.Identifier(table_name),
+        tag_col=sql.Identifier("tag_id"),
+        id_col=sql.Identifier("question_id"))
+    cursor.execute(query, (question_id, tag_id))
+
+
+@database_common.connection_handler
+def get_counted_tags(cursor):
+    query = f"""
+            SELECT t.name, count(t.id)
+            FROM tag t
+            INNER JOIN question_tag qt on t.id = qt.tag_id
+            GROUP BY t.name
+            ORDER BY count(t.id) DESC
+                """
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data
+
+
 # should return the id's of the questions where the string 'content' is found
 @database_common.connection_handler
 def search_database(cursor, content):
@@ -628,7 +659,7 @@ def add_user(cursor, user_name, password):
 @database_common.connection_handler
 def add_accepted_answer(cursor, question_id, answer_id, user_id):
     reputation = 15
-    if answer_id == "None":
+    if answer_id == "None" or answer_id is None:
         answer_id = None
         reputation = -15
     query = sql.SQL(
@@ -643,15 +674,22 @@ def add_accepted_answer(cursor, question_id, answer_id, user_id):
         question_id_col=sql.Identifier("id")
     )
     cursor.execute(query, {"q_i": question_id, "a_i": answer_id})
+    count_user_xp(user_id, "reputation", reputation)
+
+
+@database_common.connection_handler
+def count_user_xp(cursor, user_id, column, reputation):
+    print("rep is ", reputation)
     query = sql.SQL(
         """
         UPDATE {table_name}
-        SET {reputation_col} = {reputation_col} + %s
+        SET {selected_col} = {selected_col} + %s
         WHERE {id_col} = %s
             """
     ).format(
         table_name=sql.Identifier(ct.TABLE_USERS),
-        reputation_col=sql.Identifier("reputation"),
+        selected_col=sql.Identifier(column),
         id_col=sql.Identifier("id")
     )
     cursor.execute(query, (reputation, user_id,), )
+    print("ok")

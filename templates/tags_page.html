@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "root_template.html" %}
+{% block title %}Add question{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
+    <h1>Tags page</h1>
+    {% for element in tags_data %}
+        <p>#{{ element.name }}: {{ element.count }}</p>
+    {% endfor %}
+{% endblock %}

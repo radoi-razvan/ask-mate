@@ -1,7 +1,14 @@
-{% extends "basic_common_template.html" %}
+{% extends "root_template.html" %}
 {% block title %}Registration Page{% endblock %}
-{% block content %}
-<body>
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
     <h1>Registration Page</h1>
      <form method="post">
           <div class="container">
@@ -14,5 +21,4 @@
               <input type="submit" value="Signup">
           </div>
     </form>
-</body>
 {% endblock %}

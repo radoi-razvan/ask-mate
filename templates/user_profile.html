@@ -1,7 +1,14 @@
-{% extends "basic_common_template.html" %}
+{% extends "root_template.html" %}
 {% block title %}Profile Page{% endblock %}
-{% block content %}
-<body>
+{% block navbar_login_buttons %}
+    {% if user_data.name %}
+        <li class="right-items"><a href="#">{{ user_data.name }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
     <h1>Profile</h1>
     <h2>Hello, {{ user_data.name }}!</h2>
     <ol>
@@ -64,5 +71,4 @@
                 {% endfor %}
             </tbody>
         </table>
-</body>
 {% endblock %}

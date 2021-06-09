@@ -1,7 +1,14 @@
-{% extends "basic_common_template.html" %}
+{% extends "root_template.html" %}
 {% block title %}Add Question Tag{% endblock %}
-{% block content %}
-<body>
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
     <h1>Add Question Tag</h1>
     <form enctype="multipart/form-data" action="{{ url_for('add_question_tag',tags=tags_list ,question_id=question_id) }}" method="post" >
         <div class="container">
@@ -29,7 +36,7 @@
             <li>
                 <label for="tag_name">Create a tag</label>
                 <br>
-                <input name="tag_name" type="text" placeholder="add new tag"/>
+                <input name="tag_name" type="text" placeholder="add new tag" required/>
             </li>
         </ul>
         <ul>
@@ -39,6 +46,5 @@
         </ul>
         </div>
     </form>
-</body>
 {% endblock %}
 

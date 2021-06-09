@@ -1,7 +1,14 @@
-{% extends "basic_common_template.html" %}
+{% extends "root_template.html" %}
 {% block title %}Add question{% endblock %}
-{% block content %}
-<body>
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
     <h1>Add User Question</h1>
     <form enctype="multipart/form-data" action="{{ url_for('add_new_question') }}" method="post" >
         <div class="container">
@@ -34,8 +41,6 @@
         </ul>
         </div>
     </form>
-
-</body>
 {% endblock %}
 
 

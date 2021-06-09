@@ -1,11 +1,24 @@
-{% extends "common_template.html" %}
-{% block title %}Edit Comment{% endblock %}
-{% block header %}Edit Comment{% endblock %}
-{% block route %}{{ url_for('edit_comment_route', comment_id=comment_id, message=message) }}{% endblock %}
-{% block question_message_value %}
-    <label>Message:<br>
-        <textarea rows="4" cols="50" required name="message">{{ message }}</textarea>
-    </label>
-    <br><br>
+{% extends "root_template.html" %}
+{% block title %}Edit comment{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
 {% endblock %}
-{% block button_value %}value="Post"{% endblock %}
+{% block body %}
+    <h1>Ask Mate</h1>
+    <form action="{{ url_for('edit_comment_route', comment_id=comment_id, message=message) }}" method="post">
+            <div class="container">
+                Edit Comment
+                <label>Message:<br>
+                    <textarea rows="4" cols="50" required name="message">{{ message }}</textarea>
+                 </label>
+                <br><br>
+                {% block answer_message_value %}{% endblock %}
+                <input type="submit" value="Post">
+            </div>
+        </form>
+{% endblock %}
