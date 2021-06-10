@@ -12,29 +12,29 @@
 {% block body %}
     <div class="body-header">
         <h2 class="title-sign" style="width: max-content;">Users</h2>
-    <table style="width: 100%">
-        <thead class="title-sign">
-            <tr>
-                <th>Username</th>
-                <th>Registration Date</th>
-                <th>Asked Questions</th>
-                <th>Posted Answers</th>
-                <th>Posted Comments</th>
-                <th>Reputation</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for line in users_data %}
-            <tr>
-                <td><a href="{{ url_for('user_profile',user_id=line.id) }}">{{ line.name }}</a></td>
-                <td class="table-items">{{ line.registration_date }}</td>
-                <td class="table-items">{{ line.count_of_asked_questions }}</td>
-                <td class="table-items">{{ line.count_of_answers }}</td>
-                <td class="table-items">{{ line.count_of_comments }}</td>
-                <td class="table-items">{{ line.reputation }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <table style="width: 100%">
+            <thead class="title-sign">
+                <tr>
+                    <th>Username</th>
+                    <th>Registration Date</th>
+                    <th>Asked Questions</th>
+                    <th>Posted Answers</th>
+                    <th>Posted Comments</th>
+                    <th>Reputation</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for line in users_data %}
+                <tr>
+                    <td><a href="{{ url_for('user_profile',user_id=line.id) }}">{{ line.name }}</a></td>
+                    <td class="table-items">{{ line.registration_date }}</td>
+                    <td class="table-items">{{ line.count_of_asked_questions }}</td>
+                    <td class="table-items">{{ line.count_of_answers }}</td>
+                    <td class="table-items">{{ line.count_of_comments }}</td>
+                    <td class="table-items">{{ line.reputation }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

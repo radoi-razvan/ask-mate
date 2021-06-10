@@ -18,8 +18,10 @@ def route_home():
     questions_data = data_handler.get_data_sorted()
     if "username" in session:
         username = session["username"]
-        user_id = data_handler.get_user_column(username, "id")[0]["id"]
-        return render_template('home.html', questions_data=questions_data, username=username, user_id=user_id)
+        user_id = session["user_id"]
+        users_data = data_handler.get_data_unsorted(ct.TABLE_USERS, "registration_date")
+
+        return render_template('home.html', questions_data=questions_data, username=username, user_id=user_id, users_data=users_data)
     return render_template('home.html', questions_data=questions_data, username=None)
 
 
@@ -439,6 +441,7 @@ def user_profile(user_id):
                 question_id = data_handler.get_question_id_with_answer_id(comment["answer_id"])
                 comment["question_id"] = question_id
             comments.append(comment)
+        print(comment_data, answer_data, question_data)
         return render_template("user_profile.html", user_data=user_data, question_data=question_data, answer_data=answer_data, comment_data=comments)
     return redirect(url_for("route_home"))
 

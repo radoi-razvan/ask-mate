@@ -21,15 +21,15 @@
             <li>Count of comments: {{ user_data.count_of_comments }}</li>
             <li>Reputation: {{ user_data.reputation }}</li>
         </ol>
-        {% if quesiton_data %}
+        {% if question_data %}
             <table style="width: 100%">
                 <thead class="title-sign" >
                     <tr>
                         <th>Questions</th>
                         <th>Views</th>
                         <th>Votes</th>
-                        <th>Vote Up</th>
-                        <th>Vote Down</th>
+{#                        <th>Vote Up</th>#}
+{#                        <th>Vote Down</th>#}
                     </tr>
                 </thead>
                 <tbody>
@@ -37,33 +37,35 @@
                         <td ><a href="{{ url_for('route_question',question_id=question.id) }}">{{ question.title }} </a><p class="small-text">{{ question.submission_time }}</p></td>
                         <td class="table-items">{{ question.view_number }}</td>
                         <td class="table-items">{{ question.vote_number }}</td>
-                        {% if username != None %}
-                            <td class="table-items"><a href="{{ url_for('vote_up_question_route',question_id=question.id) }}"><span class="material-icons" style="color:forestgreen;">thumb_up
-                            </span></a></td>
-                            <td class="table-items"><a href="{{ url_for('vote_down_question_route',question_id=question.id) }}"><span class="material-icons" style="color:red;">thumb_down_alt
-                            </span></a></td>
-                        {% endif %}
+{#                        {% if username != None %}#}
+{#                            <td class="table-items"><a href="{{ url_for('vote_up_question_route',question_id=question.id) }}"><span class="material-icons" style="color:forestgreen;">thumb_up#}
+{#                            </span></a></td>#}
+{#                            <td class="table-items"><a href="{{ url_for('vote_down_question_route',question_id=question.id) }}"><span class="material-icons" style="color:red;">thumb_down_alt#}
+{#                            </span></a></td>#}
+{#                        {% endif %}#}
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% if answer_data %}
-                <table style="margin-top: 20px;">
+                <table style="width: 100%; margin-top: 10px">
                     <thead>
                         <tr>
                             <th class="title-sign" style="border-radius: 0">Answers</th>
+                            <th class="title-sign" style="border-radius: 0">Votes</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for answer in answer_data %}
                             <td><a href="{{ url_for('route_question',question_id=answer.question_id) }}">{{ answer.message }}</a><p class="small-text">{{ answer.submission_time }}</p></td>
+                            <td class="table-items"><p>{{ answer.vote_number }}</p></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             {% endif %}
             {% if comment_data %}
-                <table style="margin-top: 20px">
+                <table style="margin-top: 10px; width: 100%">
                     <thead>
                         <tr>
                             <th class="title-sign" style="border-radius: 0">Comments</th>

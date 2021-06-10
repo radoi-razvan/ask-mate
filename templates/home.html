@@ -10,21 +10,83 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-    <div class="body-header">
-        <h2 class="title-sign" style="font-family: Jokerman, serif">Ask Mate</h2>
-        {% if username != None %}
-            <h3 style="text-align: center"><a style="width: 100%" href="{{ url_for('users') }}">List Users</a></h3>
-        {% else %}
-            <a href="{{ url_for('registration_route') }}">Signup</a>
-            <a href="{{ url_for('login') }}">Login</a>
+{#    <div class="body-header">#}
+        <div class="body-header" style="width: 50%; margin-right: 0; margin-left: 130px; display: inline-block">
+            <h2 class="title-sign" style="font-family: Jokerman, serif">Ask Mate</h2>
+            {% if username != None %}
+                <h3 style="text-align: center"><a style="width: 100%" href="{{ url_for('users') }}">User profiles</a></h3>
+            {% else %}
+                <a href="{{ url_for('registration_route') }}">Signup</a>
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+            <h2 style="color:white;">Latest questions</h2>
+
+                <table style="width: 100%;">
+                <thead>
+                    <tr class="title-sign">
+                        <th class>Questions</th>
+                        <th>Views</th>
+                        <th>Votes</th>
+                    </tr>
+                </thead>
+                <tbody style="color: white">
+                    {% for line in questions_data %}
+                        <td ><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a><p class="small-text">{{ line.submission_time }}</p></td>
+
+                        <td class="table-items">{{ line.view_number }}</td>
+                        <td class="table-items">{{ line.vote_number }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+        <div style="display: inline-block; margin-left: 5px; margin-bottom: auto;width: 30%; position: absolute; padding: 0">
+            <div class="body-header" style="height: 50%">
+                <h3 style="color:white;">Latest 5 Questions</h3>
+                    <table style="width: 100%;">
+                    <thead>
+                        <tr class="title-sign">
+                            <th>Questions</th>
+                            <th>Views</th>
+                            <th>Votes</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: white">
+                        {% for line in questions_data %}
+                            <td ><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a><p class="small-text">{{ line.submission_time }}</p></td>
+
+                            <td class="table-items">{{ line.view_number }}</td>
+                            <td class="table-items">{{ line.vote_number }}</td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if user_id %}
+                <div class="body-header">
+                        <h3 style="color:white;">Users</h3>
+                        <table style="width: 100%;">
+                            <thead class="title-sign">
+                            <tr>
+                                <th>Username</th>
+                                <th>Reputation</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for line in users_data %}
+                                    <tr>
+                                        <td><a href="{{ url_for('user_profile',user_id=line.id) }}">{{ line.name }}</a></td>
+                                        <td class="table-items">{{ line.reputation }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                </div>
         {% endif %}
-        <h2 style="color:white;">Latest 5 Questions</h2>
-        <ol>
-            {% for question in questions_data %}
-                <li>
-                    <a href="{{ url_for('route_question',question_id=question.id) }}">{{ question.title }}</a>
-                </li>
-            {% endfor %}
-        </ol>
-    </div>
+        </div>
+{#    </div>#}
+
 {% endblock %}
