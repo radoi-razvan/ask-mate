@@ -9,16 +9,18 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-    <h1>Registration Page</h1>
-     <form method="post">
-          <div class="container">
-              <label for="username">Username</label><br>
-              <input type="email" name="username" id="username" required><br>
-              <label for="password">Password</label><br>
-              <input type="password" name="password" id="password" required><br>
-              <label for="repeat_password">Repeat Password</label><br>
-              <input type="password" name="repeat_password" id="repeat_password" required><br>
-              <input type="submit" value="Signup">
-          </div>
-    </form>
+    <div class="body-header">
+        <h2 class="title-sign" style="width: max-content">Registration Page</h2>
+         <form method="post">
+              <div class="container">
+                  <label for="username">Username</label><br>
+                  <input type="email" name="username" id="username" required><br>
+                  <label for="password">Password</label><br>
+                  <input type="password" name="password" id="password" required><br>
+                  <label for="repeat_password">Repeat Password</label><br>
+                  <input type="password" name="repeat_password" id="repeat_password" required><br>
+                  <input id="x" class="signup-button" type="submit" value="Signup">
+              </div>
+        </form>
+    </div>
 {% endblock %}

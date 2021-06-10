@@ -2,6 +2,7 @@
 {% block title %}Add question{% endblock %}
 {% block navbar_login_buttons %}
     {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
         <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
     {% else %}
         <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
@@ -9,31 +10,21 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-    <h1>Ask Mate</h1>
-    {% if username != None %}
-        <a href="{{ url_for('logout') }}">Logout</a><br>
-        <a href="{{ url_for('users') }}">List Users</a><br>
-        <a href="{{ url_for('user_profile',user_id=user_id) }}">Profile</a><br>
-    {% else %}
-        <a href="{{ url_for('registration_route') }}">Signup</a>
-        <a href="{{ url_for('login') }}">Login</a>
-    {% endif %}
-    <h2>Latest 5 Questions</h2>
-    <ol>
-        {% for question in questions_data %}
-
-            <li>
-                <a href="{{ url_for('route_question',question_id=question.id) }}">{{ question.title }}</a>
-            </li>
-        {% endfor %}
-    </ol>
-    <h3>Search Questions</h3>
-    <form action="/search" method="get">
-      <div class="container">
-        <input type="text" name="q" id="q" required>
-        <input type="submit" value="Search">
-      </div>
-    </form>
-    <a href="{{ url_for('route_list') }}">List questions</a>
-    <a href="{{ url_for('route_tags') }}">List tags</a>
+    <div class="body-header">
+        <h2 class="title-sign" style="font-family: Jokerman, serif">Ask Mate</h2>
+        {% if username != None %}
+            <h3 style="text-align: center"><a style="width: 100%" href="{{ url_for('users') }}">List Users</a></h3>
+        {% else %}
+            <a href="{{ url_for('registration_route') }}">Signup</a>
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+        <h2 style="color:white;">Latest 5 Questions</h2>
+        <ol>
+            {% for question in questions_data %}
+                <li>
+                    <a href="{{ url_for('route_question',question_id=question.id) }}">{{ question.title }}</a>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
 {% endblock %}

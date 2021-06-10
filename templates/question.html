@@ -2,6 +2,7 @@
 {% block title %}Question{% endblock %}
 {% block navbar_login_buttons %}
     {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
         <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
     {% else %}
         <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
@@ -29,10 +30,15 @@
                         {% for content in question_message_content %}
                             <p class="question-message-text">{{ content }}</p>
                         {% endfor %}
+                        {% if question_image_path != None %}
+                            <img src= "{{ "/" + question_image_path }}" width="200" height="200">
+                        {% endif %}
                     </div>
                     <div class="buttons">
-                        <a href="{{ url_for('edit_question_route', question_id=question_id) }}">Edit question</a>
-                        <a href="{{ url_for('delete_question_route', question_id=question_id) }}">Delete question</a><br>
+                        <a href="{{ url_for('edit_question_route', question_id=question_id) }}">Edit
+                        </a>
+                        <a href="{{ url_for('delete_question_route', question_id=question_id) }}">Delete
+                        </a><br>
                     </div>
                     <div class="comments-content">
                         <ul>
@@ -60,15 +66,15 @@
                 </div>
             </div>
         </div>
-
-        {% if question_image_path != None %}
-            <img src= "{{ "/" + question_image_path }}" width="200" height="200">
-        {% endif %}
         {% if answers_data %}
         <div class="answers-container">
                 <ul>
                     {% for answer in answers_data %}
-                        <li class="answer-item" style="font-size: 22px">{{ answer['message'] }}
+                        <li class="answer-item" style="font-size: 22px">
+                            <p style="display: inline">{{ answer['message'] }}</p>
+                            {% if question_data.accepted_answer_id ==answer.id %}
+                                <span class="material-icons" style="color: var(--bg-secondary)">done_outline</span>
+                            {% endif %}
                             {% if user_id == question_data["user_id"] %}
                                 <form action="{{ url_for("accepted", question_id=question_id, answer_id=answer["id"]) }}" method="post">
                                     {% if  answer["id"] == accepted_answer_id %}
@@ -83,14 +89,18 @@
                                 </form>
                             {% endif %}
                             <p style="display: inline" class="small-text">{{ answer['vote_number'] }}
-                                <a style="margin-left: 15px" href="{{ url_for('vote_up_answer_route', answer_id=answer['id']) }}">Like</a>
-                                <a href="{{ url_for('vote_down_answer_route', answer_id=answer['id']) }}">Dislike</a><br>
+                                <a style="margin-left: 15px" href="{{ url_for('vote_up_answer_route', answer_id=answer['id']) }}">
+                                    <span class="material-icons" style="color:forestgreen;">thumb_up</span>
+                                </a>
+                                <a href="{{ url_for('vote_down_answer_route', answer_id=answer['id']) }}">
+                                    <span class="material-icons" style="color:red;">thumb_down_alt</span>
+                                </a><br>
                             </p>
+                            {% if answer['image'] != None %}
+                                <img src= "{{ "/" + answer['image'] }}" width="200" height="200">
+                            {% endif %}
 
                         </li>
-                        {% if answer['image'] != None %}
-                            <img src= "{{ "/" + answer['image'] }}" width="200" height="200">
-                        {% endif %}
 
                         <div class="comments">
                             <ul>

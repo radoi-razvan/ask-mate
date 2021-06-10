@@ -2,6 +2,7 @@
 {% block title %}Add question{% endblock %}
 {% block navbar_login_buttons %}
     {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
         <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
     {% else %}
         <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
@@ -9,8 +10,13 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-    <h1>Tags page</h1>
-    {% for element in tags_data %}
-        <p>#{{ element.name }}: {{ element.count }}</p>
-    {% endfor %}
+    <div class="body-header">
+        <h2 class="title-sign" style="width: max-content">Tags</h2>
+        <div class="tags">
+            {% for element in tags_data %}
+            <h5 >#{{ element.name }}: {{ element.count }}</h5>
+        {% endfor %}
+        </div>
+    </div>
+
 {% endblock %}

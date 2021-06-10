@@ -2,6 +2,7 @@
 {% block title %}Users Page{% endblock %}
 {% block navbar_login_buttons %}
     {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
         <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
     {% else %}
         <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
@@ -9,30 +10,31 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-    <h1>Users</h1>
-    <table>
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Registration Date</th>
-                    <th>Asked Questions</th>
-                    <th>Posted Answers</th>
-                    <th>Posted Comments</th>
-                    <th>Reputation</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for line in users_data %}
-                <tr>
-                    <td><a href="{{ url_for('user_profile',user_id=line.id) }}">{{ line.name }}</a></td>
-                    <td>{{ line.registration_date }}</td>
-                    <td>{{ line.count_of_asked_questions }}</td>
-                    <td>{{ line.count_of_answers }}</td>
-                    <td>{{ line.count_of_comments }}</td>
-                    <td>{{ line.reputation }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{{ url_for('route_home') }}">Back to home</a><br>
+    <div class="body-header">
+        <h2 class="title-sign" style="width: max-content;">Users</h2>
+    <table style="width: 100%">
+        <thead class="title-sign">
+            <tr>
+                <th>Username</th>
+                <th>Registration Date</th>
+                <th>Asked Questions</th>
+                <th>Posted Answers</th>
+                <th>Posted Comments</th>
+                <th>Reputation</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for line in users_data %}
+            <tr>
+                <td><a href="{{ url_for('user_profile',user_id=line.id) }}">{{ line.name }}</a></td>
+                <td class="table-items">{{ line.registration_date }}</td>
+                <td class="table-items">{{ line.count_of_asked_questions }}</td>
+                <td class="table-items">{{ line.count_of_answers }}</td>
+                <td class="table-items">{{ line.count_of_comments }}</td>
+                <td class="table-items">{{ line.reputation }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
 {% endblock %}

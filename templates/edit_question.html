@@ -1,15 +1,46 @@
-{% extends "common_template.html" %}
-{% block title %}Edit Question{% endblock %}
-{% block header %}Edit Question{% endblock %}
-{% block route %}{{ url_for('edit_question_route', question_id=question_id) }}{% endblock %}
-{% block question_message_value %}
-    <label>Title:<br>
-        <textarea rows="4" cols="50" required name="title">{{ title }}</textarea>
-    </label>
-    <br><br>
-    <label>Message:<br>
-        <textarea rows="4" cols="50" required name="message">{{ message }}</textarea>
-    </label>
-    <br><br>
+{#{% extends "common_template.html" %}#}
+{#{% block title %}Edit Question{% endblock %}#}
+{#{% block header %}Edit Question{% endblock %}#}
+{#{% block route %}{{ url_for('edit_question_route', question_id=question_id) }}{% endblock %}#}
+{#{% block question_message_value %}#}
+{#    <label>Title:<br>#}
+{#        <textarea rows="4" cols="50" required name="title">{{ title }}</textarea>#}
+{#    </label>#}
+{#    <br><br>#}
+{#    <label>Message:<br>#}
+{#        <textarea rows="4" cols="50" required name="message">{{ message }}</textarea>#}
+{#    </label>#}
+{#    <br><br>#}
+{#{% endblock %}#}
+{#{% block button_value %}value="Post"{% endblock %}#}
+
+{% extends "root_template.html" %}
+{% block title %}Edit answer{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
 {% endblock %}
-{% block button_value %}value="Post"{% endblock %}
+{% block body %}
+    <div class="body-header">
+        <h2 class="title-sign">Edit question</h2>
+        <form action="{{ url_for('edit_answer_route', answer_id=answer_id) }}" method="post">
+            <div class="container">
+                <label>Title<br>
+                    <textarea rows="4" cols="50" required name="title">{{ title }}</textarea>
+                </label>
+                <br><br>
+                <label >Message<br>
+                    <textarea rows="4" cols="50" required name="message">{{ message }}</textarea>
+                </label>
+                <br><br>
+                {% block answer_message_value %}{% endblock %}
+                <input id="x" type="submit" value="Post">
+                </div>
+        </form>
+    </div>
+{% endblock %}

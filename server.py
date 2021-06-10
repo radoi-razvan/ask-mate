@@ -401,10 +401,10 @@ def registration_route():
         password = request.form["password"]
         if not data_handler.get_user_column(user_name, "name") and len(user_name) > 5 and len(password) > 5:
             password = cy.hash_password(password)
-            # if data_handler.add_user(user_name, password) == "ok":
-            #     session.update({ "username": user_name })
-            #     session.update({"user_id": data_handler.get_user_column(session["username"], "id")[0]["id"]})
-        return redirect(url_for("login"))
+            if data_handler.add_user(user_name, password) == "ok":
+                session.update({ "username": user_name })
+                session.update({"user_id": data_handler.get_user_column(session["username"], "id")[0]["id"]})
+        return redirect(url_for("route_home"))
     return render_template("registration.html")
 
 

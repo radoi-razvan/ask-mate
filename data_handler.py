@@ -260,6 +260,7 @@ def delete_answer(cursor, answer_id, user_id):
         WHERE {id_col} = %s
             """
     ).format(table_name=sql.Identifier(ct.TABLE_ANSWER), id_col=sql.Identifier("id"))
+    delete_comment(ct.TABLE_COMMENT, answer_id, options="answer_id", user_id=user_id)
     cursor.execute(query, (answer_id,))
     count_user_xp(user_id, "count_of_answers", reputation=-1)
     return question_id
@@ -267,24 +268,34 @@ def delete_answer(cursor, answer_id, user_id):
 
 @database_common.connection_handler
 def delete_question(cursor, question_id, user_id):
-    query = sql.SQL(
+    print("id is ", question_id)
+    query_questions = sql.SQL(
         """
         DELETE FROM {table_name}
         WHERE {id_col} = %s
             """
-    ).format(table_name=sql.Identifier(ct.TABLE_QUESTION), id_col=sql.Identifier("id"))
-    cursor.execute(query, (question_id,))
-    query = sql.SQL(
-        """
-        DELETE FROM {table_name}
-        WHERE {question_id_col} = %s
-            """
     ).format(
-        table_name=sql.Identifier(ct.TABLE_ANSWER),
-        question_id_col=sql.Identifier("question_id"),
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        id_col=sql.Identifier("id"))
+
+    query_select_answers = sql.SQL(
+        """
+        SELECT id
+        FROM answer 
+        WHERE question_id=%s
+        """
     )
+    cursor.execute(query_select_answers, (question_id,))
+    answer_ids = cursor.fetchall()
+
+    for el in answer_ids:
+        delete_comment(ct.TABLE_COMMENT, el["id"], options="answer_id", user_id=user_id)
+        delete_answer(el["id"], user_id)
+    delete_comment(ct.TABLE_COMMENT, question_id, options="question_id", user_id=user_id)
+    delete_question_tag(ct.TABLE_QUESTION_TAG, question_id)
+    cursor.execute(query_questions, (question_id,))
+
     count_user_xp(user_id, "count_of_asked_questions", reputation=-1)
-    cursor.execute(query, (question_id,))
 
 
 @database_common.connection_handler
@@ -321,6 +332,7 @@ def count_vote(cursor, table, element_id, vote, user_id):
 
 @database_common.connection_handler
 def get_question_id_with_answer_id(cursor, answer_id):
+    print(answer_id)
     query = sql.SQL(
         """
                 SELECT {question_id_col}
@@ -336,6 +348,7 @@ def get_question_id_with_answer_id(cursor, answer_id):
     data_dict = cursor.fetchall()
     for dictionary in data_dict:
         question_id = dictionary["question_id"]
+    print(data_dict)
     return question_id
 
 
@@ -439,7 +452,9 @@ def delete_comment(cursor, table_name, element_id, options, user_id):
         DELETE FROM {table_name}
         WHERE {id_col} = %s
             """
-    ).format(table_name=sql.Identifier(table_name), id_col=sql.Identifier(options))
+    ).format(
+        table_name=sql.Identifier(table_name),
+        id_col=sql.Identifier(options))
     cursor.execute(query, (element_id,))
     count_user_xp(user_id, "count_of_comments", reputation=-1)
 
@@ -534,6 +549,20 @@ def add_tag_to_question(cursor, question_id, tag_id):
         tag_col=sql.Identifier("tag_id"),
     )
     cursor.execute(query, {"id_q": question_id, "id_tag": tag_id})
+
+
+@database_common.connection_handler
+def delete_question_tag(cursor, table_name, question_id):
+    query = sql.SQL(
+        """
+        DELETE FROM {table_name}
+        WHERE {id_col} = %s 
+        """
+    ).format(
+        table_name=sql.Identifier(table_name),
+        id_col=sql.Identifier("question_id"))
+    cursor.execute(query, (question_id,))
+
 
 
 @database_common.connection_handler

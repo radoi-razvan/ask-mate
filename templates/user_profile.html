@@ -2,6 +2,7 @@
 {% block title %}Profile Page{% endblock %}
 {% block navbar_login_buttons %}
     {% if user_data.name %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
         <li class="right-items"><a href="#">{{ user_data.name }}</a></li>
     {% else %}
         <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
@@ -9,66 +10,74 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-    <h1>Profile</h1>
-    <h2>Hello, {{ user_data.name }}!</h2>
-    <ol>
-        <li>User id: {{ user_data.id }}</li>
-        <li>User name: {{ user_data.name }}</li>
-        <li>Registration date: {{ user_data.registration_date }}</li>
-        <li>Count of asked questions: {{ user_data.count_of_asked_questions }}</li>
-        <li>Count of answers: {{ user_data.count_of_answers }}</li>
-        <li>Count of comments: {{ user_data.count_of_comments }}</li>
-        <li>Reputation: {{ user_data.reputation }}</li>
-    </ol>
-        <table>
-            <thead>
-                <tr>
-                    <th>Questions</th>
-                    <th>Views</th>
-                    <th>Votes</th>
-                    <th>Submission Time</th>
-                    <th>Vote Up</th>
-                    <th>Vote Down</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for question in question_data %}
-                    <td><a href="{{ url_for('route_question',question_id=question.id) }}">{{ question.title }}</a></td>
-                    <td>{{ question.view_number }}</td>
-                    <td>{{ question.vote_number }}</td>
-                    <td>{{ question.submission_time }}</td>
-                    {% if username != None %}
-                        <td><a href="{{ url_for('vote_up_question_route',question_id=question.id) }}">Like</a></td>
-                        <td><a href="{{ url_for('vote_down_question_route',question_id=question.id) }}">Dislike</a></td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th>Answer</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for answer in answer_data %}
-                    <td><a href="{{ url_for('route_question',question_id=answer.question_id) }}">{{ answer.message }}</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th>Comment</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for comment in comment_data %}
-                    <td><a href="{{ url_for('route_question',question_id=comment.question_id) }}">{{ comment.message }}</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="answers-container">
+        <h2 style="color: white">Hello, {{ user_data.name }}!</h2>
+        <ol>
+            <li>User id: {{ user_data.id }}</li>
+            <li>User name: {{ user_data.name }}</li>
+            <li>Registration date: {{ user_data.registration_date }}</li>
+            <li>Count of asked questions: {{ user_data.count_of_asked_questions }}</li>
+            <li>Count of answers: {{ user_data.count_of_answers }}</li>
+            <li>Count of comments: {{ user_data.count_of_comments }}</li>
+            <li>Reputation: {{ user_data.reputation }}</li>
+        </ol>
+        {% if quesiton_data %}
+            <table style="width: 100%">
+                <thead class="title-sign" >
+                    <tr>
+                        <th>Questions</th>
+                        <th>Views</th>
+                        <th>Votes</th>
+                        <th>Vote Up</th>
+                        <th>Vote Down</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in question_data %}
+                        <td ><a href="{{ url_for('route_question',question_id=question.id) }}">{{ question.title }} </a><p class="small-text">{{ question.submission_time }}</p></td>
+                        <td class="table-items">{{ question.view_number }}</td>
+                        <td class="table-items">{{ question.vote_number }}</td>
+                        {% if username != None %}
+                            <td class="table-items"><a href="{{ url_for('vote_up_question_route',question_id=question.id) }}"><span class="material-icons" style="color:forestgreen;">thumb_up
+                            </span></a></td>
+                            <td class="table-items"><a href="{{ url_for('vote_down_question_route',question_id=question.id) }}"><span class="material-icons" style="color:red;">thumb_down_alt
+                            </span></a></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if answer_data %}
+                <table style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th class="title-sign" style="border-radius: 0">Answers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in answer_data %}
+                            <td><a href="{{ url_for('route_question',question_id=answer.question_id) }}">{{ answer.message }}</a><p class="small-text">{{ answer.submission_time }}</p></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            {% if comment_data %}
+                <table style="margin-top: 20px">
+                    <thead>
+                        <tr>
+                            <th class="title-sign" style="border-radius: 0">Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comment in comment_data %}
+                            <td><a href="{{ url_for('route_question',question_id=comment.question_id) }}">{{ comment.message }}</a><p class="small-text">{{ comment.submission_time }}</p></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        {% endif %}
+    </div>
+
 {% endblock %}

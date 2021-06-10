@@ -2,6 +2,7 @@
 {% block title %}List Questions{% endblock %}
 {% block navbar_login_buttons %}
     {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
         <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
     {% else %}
         <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
@@ -9,34 +10,45 @@
     {% endif %}
 {% endblock %}
 {% block body %}
-        <h1>List Questions</h1>
-        <table>
+    <div class="answers-container">
+        <div>
+             <h2 style="color: white">List Questions</h2>
+        </div>
+
+        <table style="width: 100%;">
             <thead>
-                <tr>
-                    <th>Questions</th>
+                <tr class="title-sign">
+                    <th class>Questions</th>
                     <th>Views</th>
                     <th>Votes</th>
-                    <th>Submission Time</th>
+{#                    <th>Submission Time</th>#}
                     <th>Vote Up</th>
                     <th>Vote Down</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="color: white">
                 {% for line in questions %}
-                    <td><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a></td>
-                    <td>{{ line.view_number }}</td>
-                    <td>{{ line.vote_number }}</td>
-                    <td>{{ line.submission_time }}</td>
+                    <td ><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a><p class="small-text">{{ line.submission_time }}</p></td>
+
+                    <td class="table-items">{{ line.view_number }}</td>
+                    <td class="table-items">{{ line.vote_number }}</td>
+{#                    <td class="table-items">{{ line.submission_time }}</td>#}
                     {% if username != None %}
-                        <td><a href="{{ url_for('vote_up_question_route',question_id=line.id) }}">Like</a></td>
-                        <td><a href="{{ url_for('vote_down_question_route',question_id=line.id) }}">Dislike</a></td>
+                        <td class="table-items"><a href="{{ url_for('vote_up_question_route',question_id=line.id) }}">
+                            <span class="material-icons" style="color:forestgreen;">thumb_up
+                            </span></a>
+                        </td>
+                        <td class="table-items"><a href="{{ url_for('vote_down_question_route',question_id=line.id) }}">
+                            <span class="material-icons" style="color:red;">thumb_down_alt
+                            </span></a></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% if username != None %}
-            <a href="{{ url_for('add_new_question') }}">Add a question</a><br>
+            <a class="small-text" style="color: white" href="{{ url_for('add_new_question') }}">Add a question <span class="material-icons">create</span></a><br>
         {% endif %}
-        <a href="{{ url_for('route_home') }}">Back to home</a><br>
+    </div>
+
 {% endblock %}
