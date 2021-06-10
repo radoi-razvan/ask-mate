@@ -87,35 +87,30 @@ def route_question(question_id):
     question_message_content = data_handler.get_data_for_id(
         ct.TABLE_QUESTION, question_id, "message"
     ).split(";")
-    question_title = data_handler.get_data_for_id(
-        ct.TABLE_QUESTION, question_id, "title"
-    )
+    question_data = data_handler.get_all_data_for_id(ct.TABLE_QUESTION, question_id)[0]
+    question_message_content = question_data["message"].split(";")
     question_image_path = data_handler.get_data_for_id(
         ct.TABLE_QUESTION, question_id, "image"
     )
     answers_data = data_handler.get_answers(question_id)
     question_comments_data = data_handler.get_comments_with_id(question_id, "question")
     all_comments_data = data_handler.get_all_comments()
-
-    # tag_id = data_handler.get_data_for_id(
-    #     ct.TABLE_QUESTION_TAG, question_id, "tag_id", "question_id"
-    # )
     tag_data = []
     tag_ids_list = data_handler.get_all_data_for_id(ct.TABLE_QUESTION_TAG, question_id, "question_id")
-    print(tag_ids_list)
+
     if tag_ids_list:
         for element in tag_ids_list:
             data = {}
             data.update({"tag_id": element["tag_id"]})
             data.update({"tag_name": data_handler.get_data_for_id(ct.TABLE_TAG, element["tag_id"], "name")})
             tag_data.append(data)
-    print("tag data ", tag_data)
+    print("comm data", all_comments_data[2]["user_id"])
     accepted_answer_id = data_handler.get_data_for_id(ct.TABLE_QUESTION, question_id, "accepted_answer_id", el_id="id")
     return render_template(
         "question.html",
         question_id=question_id,
-        question_data=question_message_content,
-        title=question_title,
+        question_data=question_data,
+        question_message_content=question_message_content,
         answers_data=answers_data,
         question_image_path=question_image_path,
         comments_data=question_comments_data,

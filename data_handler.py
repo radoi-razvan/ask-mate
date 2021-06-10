@@ -135,20 +135,13 @@ def get_answers(question_id):
     result_list = []
     for element in answers_list:
         if question_id == "ALL":
-            result_dict = {}
-            result_dict["id"] = element["id"]
-            result_dict["submission_time"] = element["submission_time"]
-            result_dict["vote_number"] = element["vote_number"]
-            result_dict["question_id"] = element["question_id"]
-            result_dict["message"] = element["message"]
-            result_dict["image"] = element["image"]
+            result_dict = {"id": element["id"], "submission_time": element["submission_time"],
+                           "vote_number": element["vote_number"], "question_id": element["question_id"],
+                           "message": element["message"], "image": element["image"], "user_id": element["user_id"]}
             result_list.append(result_dict)
         elif int(question_id) == element["question_id"]:
-            result_dict = {}
-            result_dict["id"] = element["id"]
-            result_dict["message"] = element["message"]
-            result_dict["vote_number"] = element["vote_number"]
-            result_dict["image"] = element["image"]
+            result_dict = {"id": element["id"], "message": element["message"], "vote_number": element["vote_number"],
+                           "image": element["image"], "user_id": element["user_id"]}
             result_list.append(result_dict)
     return result_list
 

@@ -3,14 +3,15 @@
     {% block head %}
         <meta charset="UTF-8">
         <link rel="stylesheet" href="/static/css/style.css" />
-         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap"
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap"
                rel="stylesheet"/>
         <title>{% block title %}{% endblock %}</title>
     {% endblock %}
     <body>
         <div class="navbar">
             <ul>
-                <li><a class="active" href="{{ url_for("route_home") }}">Home</a></li>
+                <li><a class="navbar-logo" href="{{ url_for("route_home") }}">ASK MATE</a></li>
                 <li><a href="{{ url_for("route_list") }}">List Questions</a></li>
                 <li><a class="active" href="{{ url_for("route_tags") }}">Tags</a></li>
                 <li><a href="#contact">Contact</a></li>
