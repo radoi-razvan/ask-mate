@@ -51,10 +51,7 @@ def get_all_data_for_id(cursor, table, element_id, el_id="id"):
         FROM {table_name}
         WHERE {id_col} = %(el_id)s
             """
-    ).format(
-        table_name=sql.Identifier(table),
-        id_col=sql.Identifier(el_id)
-    )
+    ).format(table_name=sql.Identifier(table), id_col=sql.Identifier(el_id))
     cursor.execute(query, {"el_id": element_id})
     result_list = cursor.fetchall()
     return result_list
@@ -111,7 +108,7 @@ def post_question(cursor, question_list, user_id):
             "t": question_list[0],
             "m": question_list[1],
             "i": question_list[2],
-            "u_i": question_list[3]
+            "u_i": question_list[3],
         },
     )
 
@@ -135,13 +132,24 @@ def get_answers(question_id):
     result_list = []
     for element in answers_list:
         if question_id == "ALL":
-            result_dict = {"id": element["id"], "submission_time": element["submission_time"],
-                           "vote_number": element["vote_number"], "question_id": element["question_id"],
-                           "message": element["message"], "image": element["image"], "user_id": element["user_id"]}
+            result_dict = {
+                "id": element["id"],
+                "submission_time": element["submission_time"],
+                "vote_number": element["vote_number"],
+                "question_id": element["question_id"],
+                "message": element["message"],
+                "image": element["image"],
+                "user_id": element["user_id"],
+            }
             result_list.append(result_dict)
         elif int(question_id) == element["question_id"]:
-            result_dict = {"id": element["id"], "message": element["message"], "vote_number": element["vote_number"],
-                           "image": element["image"], "user_id": element["user_id"]}
+            result_dict = {
+                "id": element["id"],
+                "message": element["message"],
+                "vote_number": element["vote_number"],
+                "image": element["image"],
+                "user_id": element["user_id"],
+            }
             result_list.append(result_dict)
     return result_list
 
@@ -175,7 +183,7 @@ def post_answer(cursor, question_id, answer, user_id):
             "q_i": question_id,
             "m": answer[0],
             "i": answer[1],
-            "u_id": answer[2]
+            "u_id": answer[2],
         },
     )
 
@@ -196,7 +204,7 @@ def post_answer(cursor, question_id, answer, user_id):
 
 @database_common.connection_handler
 def edit_answer(cursor, answer_id, content):
-    print('content is ', content)
+    print("content is ", content)
     query = sql.SQL(
         """
         UPDATE {table_name} 
@@ -274,9 +282,7 @@ def delete_question(cursor, question_id, user_id):
         DELETE FROM {table_name}
         WHERE {id_col} = %s
             """
-    ).format(
-        table_name=sql.Identifier(ct.TABLE_QUESTION),
-        id_col=sql.Identifier("id"))
+    ).format(table_name=sql.Identifier(ct.TABLE_QUESTION), id_col=sql.Identifier("id"))
 
     query_select_answers = sql.SQL(
         """
@@ -291,7 +297,9 @@ def delete_question(cursor, question_id, user_id):
     for el in answer_ids:
         delete_comment(ct.TABLE_COMMENT, el["id"], options="answer_id", user_id=user_id)
         delete_answer(el["id"], user_id)
-    delete_comment(ct.TABLE_COMMENT, question_id, options="question_id", user_id=user_id)
+    delete_comment(
+        ct.TABLE_COMMENT, question_id, options="question_id", user_id=user_id
+    )
     delete_question_tag(ct.TABLE_QUESTION_TAG, question_id)
     cursor.execute(query_questions, (question_id,))
 
@@ -317,7 +325,7 @@ def count_vote(cursor, table, element_id, vote, user_id):
     ).format(
         table_name=sql.Identifier(table),
         vote_number_col=sql.Identifier("vote_number"),
-        id_col=sql.Identifier("id")
+        id_col=sql.Identifier("id"),
     )
     cursor.execute(
         query,
@@ -399,15 +407,19 @@ def get_comments_with_id(cursor, corespondent_id, options):
 
 @database_common.connection_handler
 def get_option_id_with_comment_id(cursor, comment_id, options):
-    query = sql.SQL("""
+    query = sql.SQL(
+        """
         SELECT {question_id_col} FROM {table_name}
         WHERE ({id_col} = %(id)s)
-        """).format(
+        """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_COMMENT),
         question_id_col=sql.Identifier(options),
-        id_col=sql.Identifier('id'))
-    cursor.execute(query, {'id': comment_id})
+        id_col=sql.Identifier("id"),
+    )
+    cursor.execute(query, {"id": comment_id})
     data = cursor.fetchall()
+    # data = cursor.fetchone() instead of data = cursor.fetchall() # returns only one dictionary
     print(data)
     return data[0][options]
 
@@ -425,7 +437,7 @@ def get_all_comments(cursor):
 
 @database_common.connection_handler
 def post_comment(cursor, question_id, answer_id, content, user_id):
-    print('content is ', content)
+    print("content is ", content)
     post_time = ut.get_formatted_time(round(time.time()))
     query = """
         INSERT INTO comment (question_id,answer_id,message,submission_time,edited_count,user_id)
@@ -439,7 +451,7 @@ def post_comment(cursor, question_id, answer_id, content, user_id):
             "message": content,
             "submission_time": post_time,
             "edited_count": None,
-            "u_id": user_id
+            "u_id": user_id,
         },
     )
     count_user_xp(user_id, "count_of_comments", reputation=1)
@@ -452,9 +464,7 @@ def delete_comment(cursor, table_name, element_id, options, user_id):
         DELETE FROM {table_name}
         WHERE {id_col} = %s
             """
-    ).format(
-        table_name=sql.Identifier(table_name),
-        id_col=sql.Identifier(options))
+    ).format(table_name=sql.Identifier(table_name), id_col=sql.Identifier(options))
     cursor.execute(query, (element_id,))
     count_user_xp(user_id, "count_of_comments", reputation=-1)
 
@@ -478,7 +488,7 @@ def edit_comment(cursor, comment_id, content):
 @database_common.connection_handler
 def increment_edited_count(cursor, comment_id):
     data = get_data_for_id(ct.TABLE_COMMENT, comment_id, "edited_count")
-    print('data is ', data)
+    print("data is ", data)
     if data is None:
         edited_count = 1
     else:
@@ -559,10 +569,9 @@ def delete_question_tag(cursor, table_name, question_id):
         WHERE {id_col} = %s 
         """
     ).format(
-        table_name=sql.Identifier(table_name),
-        id_col=sql.Identifier("question_id"))
+        table_name=sql.Identifier(table_name), id_col=sql.Identifier("question_id")
+    )
     cursor.execute(query, (question_id,))
-
 
 
 @database_common.connection_handler
@@ -576,7 +585,8 @@ def delete_tag(cursor, table_name, question_id, tag_id):
     ).format(
         table_name=sql.Identifier(table_name),
         tag_col=sql.Identifier("tag_id"),
-        id_col=sql.Identifier("question_id"))
+        id_col=sql.Identifier("question_id"),
+    )
     cursor.execute(query, (question_id, tag_id))
 
 
@@ -605,12 +615,13 @@ def search_database(cursor, content):
         SELECT {id_col} FROM {table_name}
         WHERE {title_col} LIKE '%%'|| %(some_text)s ||'%%' 
         OR {message_col} LIKE '%%'|| %(some_text)s ||'%%' 
-        """).format(
-            table_name=sql.Identifier(ct.TABLE_QUESTION),
-            id_col=sql.Identifier("id"),
-            title_col=sql.Identifier("title"),
-            message_col=sql.Identifier("message")
-        )
+        """
+    ).format(
+        table_name=sql.Identifier(ct.TABLE_QUESTION),
+        id_col=sql.Identifier("id"),
+        title_col=sql.Identifier("title"),
+        message_col=sql.Identifier("message"),
+    )
     cursor.execute(query, {"some_text": content})
 
     for el in cursor.fetchall():
@@ -622,17 +633,18 @@ def search_database(cursor, content):
         """
         SELECT {q_id_col}, {a_id_col} FROM {table_name}
         WHERE {message_col} LIKE '%%'|| %(some_text)s ||'%%' 
-        """).format(
+        """
+    ).format(
         table_name=sql.Identifier(ct.TABLE_ANSWER),
         q_id_col=sql.Identifier("question_id"),
         a_id_col=sql.Identifier("id"),
-        message_col=sql.Identifier("message")
+        message_col=sql.Identifier("message"),
     )
     cursor.execute(query, {"some_text": content})
     for el in cursor.fetchall():
-        if el['question_id'] not in question_id_list:
-            question_id_list.append(el['question_id'])
-        answer_id_list.append(el['id'])
+        if el["question_id"] not in question_id_list:
+            question_id_list.append(el["question_id"])
+        answer_id_list.append(el["id"])
     return question_id_list, answer_id_list
 
 
@@ -647,7 +659,7 @@ def get_user_column(cursor, value, options):
     ).format(
         table_name=sql.Identifier(ct.TABLE_USERS),
         field_col=sql.Identifier(options),
-        username_col=sql.Identifier("name")
+        username_col=sql.Identifier("name"),
     )
     cursor.execute(query, {"u_f": value})
     data = cursor.fetchall()
@@ -657,7 +669,7 @@ def get_user_column(cursor, value, options):
 @database_common.connection_handler
 def add_user(cursor, user_name, password):
     registration_date = ut.get_formatted_time(round(time.time()))
-    query = sql.SQL (
+    query = sql.SQL(
         """
         INSERT INTO {table_name} ({name_col},{password_col},
         {registration_date_col},{count_of_asked_questions_col},
@@ -693,7 +705,7 @@ def add_accepted_answer(cursor, question_id, answer_id, user_id):
     ).format(
         table_name=sql.Identifier(ct.TABLE_QUESTION),
         accepted_answer_id_col=sql.Identifier("accepted_answer_id"),
-        question_id_col=sql.Identifier("id")
+        question_id_col=sql.Identifier("id"),
     )
     cursor.execute(query, {"q_i": question_id, "a_i": answer_id})
     count_user_xp(user_id, "reputation", reputation)
@@ -711,7 +723,13 @@ def count_user_xp(cursor, user_id, column, reputation):
     ).format(
         table_name=sql.Identifier(ct.TABLE_USERS),
         selected_col=sql.Identifier(column),
-        id_col=sql.Identifier("id")
+        id_col=sql.Identifier("id"),
     )
-    cursor.execute(query, (reputation, user_id,), )
+    cursor.execute(
+        query,
+        (
+            reputation,
+            user_id,
+        ),
+    )
     print("ok")
