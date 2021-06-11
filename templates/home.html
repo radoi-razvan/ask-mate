@@ -31,7 +31,17 @@
                 </thead>
                 <tbody style="color: white">
                     {% for line in questions_data %}
-                        <td ><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a><p class="small-text">{{ line.submission_time }}</p></td>
+                        <td>
+                            <a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a>
+                            <p class="small-text">{{ line.submission_time }}</p>
+                            <p style="display: inline-block" class="small-text" >
+                                <a style="margin-left: 15px" href="{{ url_for('vote_up_question_route', question_id=line.id) }}">
+                                    <span class="material-icons" style="color:forestgreen;">thumb_up</span>
+                                </a>
+                                <a href="{{ url_for('vote_down_question_route', question_id=line.id) }}">
+                                    <span class="material-icons" style="color:red;">thumb_down_alt</span>
+                                </a><br>
+                        </td>
 
                         <td class="table-items">{{ line.view_number }}</td>
                         <td class="table-items">{{ line.vote_number }}</td>
@@ -44,7 +54,7 @@
         </div>
         <div style="display: inline-block; margin-left: 5px; margin-bottom: auto;width: 30%; position: absolute; padding: 0">
             <div class="body-header" style="height: 50%">
-                <h3 style="color:white;">Latest 5 Questions</h3>
+                <h3 style="color:white;">Most voted Questions</h3>
                     <table style="width: 100%;">
                     <thead>
                         <tr class="title-sign">
@@ -55,8 +65,18 @@
                     </thead>
                     <tbody style="color: white">
                         {% for line in questions_data %}
-                            <td ><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a><p class="small-text">{{ line.submission_time }}</p></td>
-
+                            <td >
+                                <a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a>
+                                <p class="small-text">{{ line.submission_time }}</p>
+                                <p style="display: inline-block" class="small-text">
+                                    <a style="margin-left: 15px" href="{{ url_for('vote_up_question_route', question_id=line.id) }}">
+                                        <span class="material-icons" style="color:forestgreen;">thumb_up</span>
+                                    </a>
+                                    <a href="{{ url_for('vote_down_question_route', question_id=line.id) }}">
+                                        <span class="material-icons" style="color:red;">thumb_down_alt</span>
+                                    </a><br>
+                                </p>
+                            </td>
                             <td class="table-items">{{ line.view_number }}</td>
                             <td class="table-items">{{ line.vote_number }}</td>
 

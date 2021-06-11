@@ -29,6 +29,14 @@
                     <div class="question-content">
                         {% for content in question_message_content %}
                             <p class="question-message-text">{{ content }}</p>
+{#                            <p style="display: inline-block" class="small-text">#}
+{#                                    <a style="margin-left: 15px" href="{{ url_for('vote_up_question_route', question_id=question_id) }}">#}
+{#                                        <span class="material-icons" style="color:forestgreen;">thumb_up</span>#}
+{#                                    </a>#}
+{#                                    <a href="{{ url_for('vote_down_question_route', question_id=question_id) }}">#}
+{#                                        <span class="material-icons" style="color:red;">thumb_down_alt</span>#}
+{#                                    </a><br>#}
+{#                            </p>#}
                         {% endfor %}
                         {% if question_image_path != None %}
                             <img src= "{{ "/" + question_image_path }}" width="200" height="200">

@@ -15,7 +15,7 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 @app.route("/")
 def route_home():
-    questions_data = data_handler.get_data_sorted()
+    questions_data = data_handler.sort_questions("vote_number", "desc")
     if "username" in session:
         username = session["username"]
         user_id = session["user_id"]
