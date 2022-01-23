@@ -1,8 +1,6 @@
-# AskMate
-
 <div id="top"></div>
 
-# ASK MATE
+# AskMate
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -93,7 +91,7 @@ Edit Question:
 
 New Question Comment:
 
-![add_question_comment.jpg][post-answer] search.jpg
+![add_question_comment.jpg][post-answer]
 
 Search:
 
@@ -146,8 +144,10 @@ Open the server address in the browser.
 [css]: https://www.w3.org/Style/CSS/Overview.en.html
 [visual-studio-code]: https://code.visualstudio.com/
 [virtualenv]: https://pypi.org/project/virtualenv/
+
 [radoi-razvan]: https://github.com/radoi-razvan
 [mateiocristi]: https://github.com/mateiocristi
+
 [home-page]: assets/main_page.jpg
 [register-page]: assets/register.jpg
 [question-page]: assets/question.jpg
