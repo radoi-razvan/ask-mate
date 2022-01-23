@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% block head %}
+        <meta charset="UTF-8">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap"
+               rel="stylesheet"/>
+        <title>{% block title %}{% endblock %}</title>
+    {% endblock %}
+    <body>
+        <div class="navbar">
+            <ul>
+                <li><a class="navbar-logo" href="{{ url_for("route_home") }}">ASK MATE</a></li>
+                <li><a href="{{ url_for("route_list") }}">List Questions</a></li>
+                <li><a class="active" href="{{ url_for("route_tags") }}">Tags</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#about">About</a></li>
+                <li>
+                    <form class="search-form" action="/search" method="get">
+                        <input type="text" name="q" id="q" class="search-input" placeholder="Search..." required>
+                        <button class="search-button" type="submit" ><span class="material-icons">search</span></button>
+                    </form>
+                </li>
+                {% block navbar_login_buttons %}
+                {% endblock %}
+            </ul>
+        </div>
+        <div class="content">
+            {% block body %}
+            {% endblock %}
+        </div>
+
+    </body>
+</html>

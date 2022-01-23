@@ -1,0 +1,44 @@
+{% extends "root_template.html" %}
+{% block title %}List Questions{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
+    <div class="answers-container">
+        <div>
+             <h2 style="color: white">List Questions</h2>
+        </div>
+
+        <table style="width: 100%;">
+            <thead>
+                <tr class="title-sign">
+                    <th class>Questions</th>
+                    <th>Views</th>
+                    <th>Votes</th>
+{#                    <th>Submission Time</th>#}
+{#                    <th>Vote Up</th>#}
+{#                    <th>Vote Down</th>#}
+                </tr>
+            </thead>
+            <tbody style="color: white">
+                {% for line in questions %}
+                    <td ><a href="{{ url_for('route_question',question_id=line.id) }}">{{ line.title }}</a><p class="small-text">{{ line.submission_time }}</p></td>
+
+                    <td class="table-items">{{ line.view_number }}</td>
+                    <td class="table-items">{{ line.vote_number }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if username != None %}
+            <a class="small-text" style="color: white" href="{{ url_for('add_new_question') }}">Add a question <span class="material-icons">create</span></a><br>
+        {% endif %}
+    </div>
+
+{% endblock %}

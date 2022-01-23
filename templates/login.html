@@ -1,0 +1,25 @@
+{% extends "root_template.html" %}
+{% block title %}Login Page{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
+    <h1>Login Page</h1>
+     <form method="post">
+          <div class="container">
+              {% if message != None %}
+                  <p>{{ message }}</p>
+              {% endif %}
+              <label for="username">Username</label><br>
+              <input type="email" name="username" id="username" required><br>
+              <label for="password">Password</label><br>
+              <input type="password" name="password" id="password" required><br>
+              <input type="submit" value="Login">
+          </div>
+    </form>
+{% endblock %}

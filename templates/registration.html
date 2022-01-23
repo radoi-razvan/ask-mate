@@ -1,0 +1,26 @@
+{% extends "root_template.html" %}
+{% block title %}Registration Page{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
+    <div class="body-header">
+        <h2 class="title-sign" style="width: max-content">Registration Page</h2>
+         <form method="post">
+              <div class="container">
+                  <label for="username">Username</label><br>
+                  <input type="email" name="username" id="username" required><br>
+                  <label for="password">Password</label><br>
+                  <input type="password" name="password" id="password" required><br>
+                  <label for="repeat_password">Repeat Password</label><br>
+                  <input type="password" name="repeat_password" id="repeat_password" required><br>
+                  <input id="x" class="signup-button" type="submit" value="Signup">
+              </div>
+        </form>
+    </div>
+{% endblock %}

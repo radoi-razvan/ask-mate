@@ -1,0 +1,30 @@
+{% extends "root_template.html" %}
+{% block title %}Search{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
+    <div class="body-header">
+        <h2 class="title-sign" style="width: max-content">Search results</h2>
+        <div id="questions">
+            {% for q_data in questions_data %}
+                <div class="highlighted" style="color: var(--bg-secondary)">Question Title </div><p class="searched-item" style="margin-left: 25px">{{ q_data.title }}</p><br>
+                <div class="highlighted" style="color: var(--bg-secondary)">Question Message </div><p class="searched-item" style="margin-left: 25px">{{ q_data.message }}</p><br>
+                {% for ans_data in answers_data %}
+                    {% if ans_data.question_id == q_data.id %}
+                        <div class="highlighted indented" style="color: var(--bg-secondary)">Answer Message </div><p class="searched-item" style="margin-left: 25px">{{ ans_data.message }}</p><br>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+        <a style="float: right" href="{{ url_for('route_list') }}">List all questions</a><br>
+    </div>
+
+
+{% endblock %}

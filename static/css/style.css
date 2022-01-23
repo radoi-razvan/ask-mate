@@ -1,0 +1,274 @@
+:root {
+    margin: 0;
+    font-size: 24px;
+    font-family: 'Open Sans', serif;
+    --text-primary: #fff;
+    --text-secondary: #000;
+    --bg-primary: #23232e;
+    --bg-secondary: #ff9203;
+    --comment-font-size: 16px;
+}
+
+.material-icons {
+    font-size: 20px;
+    text-align: center;
+}
+
+textarea {
+    outline: none;
+    resize: none;
+}
+
+h1 {
+    margin: 0;
+}
+
+p {
+    margin: 0;
+}
+
+ul {
+    list-style-type: none;
+}
+
+ol {
+    list-style-type: none;
+}
+
+body {
+    color: white;
+    background-color: grey;
+    /*background-image: url("https://www.valtech.com/4a5e64/globalassets/00-global/02-images/04-insights/14-essential-questions-for-your-digital-workplace/question-mark-1872665.jpg");*/
+    background-size: 100% auto;
+    padding: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-left: 0;
+}
+
+body::-webkit-scrollbar {
+    width: 0.25rem;
+}
+
+body::-webkit-scrollbar-track {
+    background: #1e1e24;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #6649b8;
+}
+
+/*main {*/
+/*  margin-left: 5rem;*/
+/*  padding: 1rem;*/
+/*}*/
+
+input[type=submit] {
+    background-color: var(--bg-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+}
+
+input[type=submit]:hover {
+  opacity: 0.8;
+}
+
+input {
+    padding: 10px;
+}
+
+a:hover {
+    color: var(--bg-secondary);
+    cursor: pointer;
+    }
+
+a {
+    text-decoration: none;
+    text-decoration-color: black;
+    color: white;
+}
+
+input, label{
+    margin: 5px;
+}
+
+.small-text, .table-items {
+    text-align: left;
+    margin-left: 20px;
+    color: #C0C0C0;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.table-items {
+    text-align: center;
+}
+
+.navbar ul{
+    list-style-type: none;
+    height: 50px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--bg-primary);
+}
+
+.navbar li {
+    font-size: 16px;
+    height: 50px;
+    width: fit-content;
+    float: left;
+}
+
+.navbar .right-items, .right-items-logout {
+    float: right;
+}
+
+.bordered-item {
+    border: solid 2px var(--bg-secondary);
+    border-radius: 5px;
+}
+
+.navbar-logo {
+    font-size: 100%;
+    font-family: Jokerman, serif;
+    font-weight: bolder;
+}
+
+.navbar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navbar li a:hover {
+    background-color: var(--bg-secondary);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /*border-radius: 5px;*/
+    color: #000
+}
+
+.search-form{
+    height: 16px;
+    align-content: center;
+
+}
+
+.search-input {
+    height: 10px;
+    padding: 12px;
+}
+
+.search-button {
+    border: none;
+    background: var(--bg-secondary);
+    border-radius: 45%;
+    color: white;
+}
+
+
+.search-button:hover {
+    cursor: pointer;
+    background: var(--bg-primary);
+    color: var(--bg-secondary);
+}
+
+.link-text {
+    display: none;
+    margin-left: 5.5rem;
+    font-size: 24px;
+}
+
+.content {
+    margin: 0 5rem;
+}
+
+.body-header , .question-message-container, .answers-container{
+    margin: 1rem 1rem 20px;
+    padding: 20px;
+    background-color: var(--bg-primary);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 7px;
+    margin-inside: 10px;
+}
+
+.question-message-container {
+    box-shadow: none;
+}
+
+.page-content {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.body-header h1 {
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.title-sign {
+    margin-right: 10px;
+    text-align: center;
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.tags h5 {
+    display: inline;
+    color: var(--text-primary);
+    background-color: darkslategrey;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.tags-text {
+    text-align: center;
+}
+
+.question-message-container {
+    margin: 0 1rem;
+    border-radius: 0;
+}
+
+.answers-container {
+    margin: 10px 1rem;
+
+}
+
+.question-message-text {
+    text-align: left;
+    color: var(--text-primary);
+}
+
+.buttons a {
+    font-size: 16px;
+}
+
+.comment-item, .answer-item {
+    /*display: block;*/
+    width: fit-content;
+    color: white;
+    font-size: var(--comment-font-size);
+    border-top: solid 1px dimgrey;
+}
+
+.searched-item {
+    margin: 0;
+}
+
+#x {
+    background-color: #ff9203;
+    border-radius: 3px;
+}
+
+/*.fa-user {*/
+/*    font-size: 10px;*/
+/*}*/
+
+

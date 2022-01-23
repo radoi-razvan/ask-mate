@@ -1,0 +1,40 @@
+{% extends "root_template.html" %}
+{% block title %}Post an answer{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
+    <div class="body-header">
+        <h2 class="title-sign">Post an answer</h2>
+        <form enctype="multipart/form-data" action="{{ url_for('add_new_answer', question_id=question_id) }}" method="post" >
+            <div class="container">
+            <ul>
+                <li>
+                    <label for="message">Your answer</label>
+                    <br>
+                    <textarea rows="5" cols="60" name="message" required="required"></textarea>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <label for="picture">Add Photo (only .jpg and .png extensions)</label>
+                    <br>
+                    <input type="file" name="file"/>
+                    <br>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <input id="x" type="submit" value="Post answer"/>
+                </li>
+            </ul>
+            </div>
+        </form>
+    </div>
+{% endblock %}

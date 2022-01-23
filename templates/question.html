@@ -1,0 +1,145 @@
+{% extends "root_template.html" %}
+{% block title %}Question{% endblock %}
+{% block navbar_login_buttons %}
+    {% if username %}
+        <li class="right-items"><a style="font-size: 13px" class="bordered-item" href="{{ url_for('logout') }}">Logout</a></li>
+        <li class="right-items"><a href="{{ url_for("user_profile", user_id=user_id) }}">{{ username }}</a></li>
+    {% else %}
+        <li class="right-items"><a href="{{ url_for("login") }}">Login</a></li>
+        <li class="right-items"><a href="{{ url_for("registration_route") }}">Register</a></li>
+    {% endif %}
+{% endblock %}
+{% block body %}
+        <div class="body-header">
+            <div class="page-content">
+                <div class="body-header-title">
+                    <h2 class="title-sign" style="display: inline" >Question</h2><h1 style="display: inline">{{ question_data.title }}</h1>
+                </div>
+                <div class="body-header-description">
+                   <h2 class="small-text">{{ username }} at {{ question_data.submission_time }}</h2>
+                </div>
+                <div class="tags">
+                    {% if question_tags_list != []  %}
+                        {% for tag_data in question_tags_list %}
+                            <h5 class="tags-text">#{{ tag_data.tag_name }}<a href="{{ url_for('delete_tag_route', question_id=question_id, tag_id=tag_data.tag_id) }}"> x</a></h5>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="question-message-container">
+                    <div class="question-content">
+                        {% for content in question_message_content %}
+                            <p class="question-message-text">{{ content }}</p>
+{#                            <p style="display: inline-block" class="small-text">#}
+{#                                    <a style="margin-left: 15px" href="{{ url_for('vote_up_question_route', question_id=question_id) }}">#}
+{#                                        <span class="material-icons" style="color:forestgreen;">thumb_up</span>#}
+{#                                    </a>#}
+{#                                    <a href="{{ url_for('vote_down_question_route', question_id=question_id) }}">#}
+{#                                        <span class="material-icons" style="color:red;">thumb_down_alt</span>#}
+{#                                    </a><br>#}
+{#                            </p>#}
+                        {% endfor %}
+                        {% if question_image_path != None %}
+                            <img src= "{{ "/" + question_image_path }}" width="200" height="200">
+                        {% endif %}
+                    </div>
+                    <div class="buttons">
+                        <a href="{{ url_for('edit_question_route', question_id=question_id) }}">Edit
+                        </a>
+                        <a href="{{ url_for('delete_question_route', question_id=question_id) }}">Delete
+                        </a><br>
+                    </div>
+                    <div class="comments-content">
+                        <ul>
+                            {% for comment_data in comments_data %}
+                                <li class="comment-item">{{ comment_data['message'] }}</li>
+                                <li class="small-text" style="color: grey">{{ comment_data['submission_time'] }}
+                                    {% if comment_data['edited_count'] != None %}
+                                        Edited {{ comment_data['edited_count'] }} times
+                                    {% endif %}
+                                    {% if comment_data["user_id"] == user_id %}
+                                        <a href="{{ url_for('edit_comment_route', comment_id=comment_data['id']) }}">Edit</a>
+                                        <a href="{{ url_for('delete_comment_route', comment_id=comment_data['id']) }}">Delete</a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="buttons">
+                        {% if username != None %}
+                            <a href="{{ url_for('add_question_comment', question_id=question_id) }}">Add question comment</a><br>
+                            <a href="{{ url_for('add_new_answer', question_id=question_id) }}">Add new answer</a><br>
+                            <a href="{{ url_for('add_question_tag', question_id=question_id) }}">Add a tag</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if answers_data %}
+        <div class="answers-container">
+                <ul>
+                    {% for answer in answers_data %}
+                        <li class="answer-item" style="font-size: 22px">
+                            <p style="display: inline">{{ answer['message'] }}</p>
+                            {% if question_data.accepted_answer_id ==answer.id %}
+                                <span class="material-icons" style="color: var(--bg-secondary)">done_outline</span>
+                            {% endif %}
+                            {% if user_id == question_data["user_id"] %}
+                                <form action="{{ url_for("accepted", question_id=question_id, answer_id=answer["id"]) }}" method="post">
+                                    {% if  answer["id"] == accepted_answer_id %}
+                                        <label for="accepted"></label>
+                                        <input type="checkbox" name="accepted" checked value="{{ None }}"/>
+                                        <button type="submit">Unmark</button>
+                                    {% else %}
+                                        <label for="accepted"></label>
+                                        <input type="checkbox" name="accepted" value="{{ answer["id"] }}" required/>
+                                        <button type="submit">Mark</button>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
+                            <p style="display: inline" class="small-text">{{ answer['vote_number'] }}
+                                <a style="margin-left: 15px" href="{{ url_for('vote_up_answer_route', answer_id=answer['id']) }}">
+                                    <span class="material-icons" style="color:forestgreen;">thumb_up</span>
+                                </a>
+                                <a href="{{ url_for('vote_down_answer_route', answer_id=answer['id']) }}">
+                                    <span class="material-icons" style="color:red;">thumb_down_alt</span>
+                                </a><br>
+                            </p>
+                            {% if answer['image'] != None %}
+                                <img src= "{{ "/" + answer['image'] }}" width="200" height="200">
+                            {% endif %}
+
+                        </li>
+
+                        <div class="comments">
+                            <ul>
+                            {% for comment in all_comments_data %}
+                                {% if comment['answer_id'] ==  answer['id'] %}
+                                    <li class="comment-item">{{ comment['message'] }}</li>
+                                    <li class="small-text" style="color: grey">{{ comment['submission_time'] }}
+                                        {% if comment['edited_count'] != None %}
+                                            Edited {{ comment['edited_count'] }} times
+                                        {% endif %}
+                                        {% if comment.user_id == user_id %}
+                                                <a style="display: inline" href="{{ url_for('edit_comment_route', comment_id=comment['id']) }}">Edit</a>
+                                                <a style="display: inline" href="{{ url_for('delete_comment_route', comment_id=comment['id']) }}">Delete</a>
+                                        {% endif %}
+                                    </li>
+
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="buttons">
+                            {% if username != None %}
+                            {% if answer.user_id == user_id %}
+                                <a href="{{ url_for('edit_answer_route', answer_id=answer['id']) }}">Edit answer</a>
+                                <a href="{{ url_for('delete_answer_route', answer_id=answer['id']) }}">Delete answer</a><br>
+                            {% endif %}
+                            <a href="{{ url_for('add_answer_comment', answer_id=answer['id']) }}">Add answer comment</a>
+                        {% endif %}
+                        </div>
+                    {% endfor %}
+                </ul>
+        </div>
+        {% endif %}
+{% endblock %}
